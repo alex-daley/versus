@@ -58,6 +58,8 @@ if(NOT raylib_FOUND)
 endif()
 
 add_executable(versus 
-    main.c)
+    main.c 
+    drawing.h 
+    drawing.c)
 
 target_link_libraries(versus raylib)

@@ -1,9 +1,44 @@
 #include <math.h>
 #include <raylib.h>
+#include "drawing.h"
+
+#define MIN(a, b) (a < b ? a : b)
+
+static const char* title = "Versus";
 
 static const double targetFrameTime = 1.0 / 60.0;
+static const int targetFrameRate = 60;
+static const int flags = FLAG_VSYNC_HINT;
 
-static double SnapFrameTime(double frameTime, double fps) 
+static const int nativeWidth  = 320;
+static const int nativeHeight = 240;
+static const int screenWidth  = 1280;
+static const int screenHeight = 720;
+
+typedef struct Resources
+{
+    RenderTexture renderTarget;
+} Resources;
+
+static Resources Initialise()
+{
+    SetConfigFlags(flags);
+    SetTargetFPS(targetFrameRate);
+    InitWindow(screenWidth, screenHeight, title);
+
+    Resources resources = { 0 };
+    resources.renderTarget = LoadRenderTexture(nativeWidth, nativeHeight);
+
+    return resources;
+}
+
+static void Shutdown(Resources* resources)
+{
+    UnloadRenderTexture(resources->renderTarget);
+    CloseWindow();
+}
+
+static double SnapFrameTime(double frameTime, double fps)
 {
     const double precision = 0.0002;
     return fabs(frameTime - (1.0 / fps)) < precision
@@ -11,12 +46,38 @@ static double SnapFrameTime(double frameTime, double fps)
         : frameTime;
 }
 
-int main() 
+static void DrawRenderTarget(const RenderTexture* target)
 {
-    SetConfigFlags(FLAG_VSYNC_HINT);
-    SetTargetFPS(60);
-    InitWindow(1280, 720, "Versus");
-    
+    // Scale native game resolution to window resolution.
+
+    float cx = (float)GetScreenWidth();
+    float cy = (float)GetScreenHeight();
+    float scale = MIN(cx / nativeWidth, cy / nativeHeight);
+
+    Rectangle source = { 0.0f,  0.0f,  nativeWidth,  -nativeHeight };
+    Rectangle destination = {
+        (cx - ((float)nativeWidth  * scale)) / 2.0f,
+        (cy - ((float)nativeHeight * scale)) / 2.0f,
+        nativeWidth * scale,
+        nativeHeight * scale
+    };
+
+    // Draw
+
+    DrawTexturePro(
+        target->texture,
+        source,
+        destination,
+        (Vector2) { 0.0f, 0.0f },
+        0.0f,
+        WHITE);
+}
+
+int main()
+{
+    Resources resources = Initialise();
+    RenderTexture* renderTarget = &resources.renderTarget;
+
     double accumulator = 0.0;
     while (!WindowShouldClose())
     {
@@ -36,11 +97,18 @@ int main()
         }
 
         BeginDrawing();
-        ClearBackground(BLUE);
+        ClearBackground(BLACK);
+
+        BeginTextureMode(*renderTarget);
+        ClearBackground(BLACK);
+        DrawGrid(20, 15, 16);
+        EndTextureMode();
+        DrawRenderTarget(renderTarget);
+
         EndDrawing();
     }
-    
-    CloseWindow();
+
+    Shutdown(&resources);
 
     return 0;
 }
