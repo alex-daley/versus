@@ -63,3 +63,7 @@ add_executable(versus
     grid.c)
 
 target_link_libraries(versus raylib)
+
+# Copy assets/export to our executable's directory.
+file(COPY ${PROJECT_SOURCE_DIR}/assets/export 
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
