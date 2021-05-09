@@ -59,6 +59,7 @@ endif()
 
 add_executable(versus 
     main.c 
-    editor.c)
+    editor.c
+    grid.c)
 
 target_link_libraries(versus raylib)
