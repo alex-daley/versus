@@ -59,7 +59,6 @@ endif()
 
 add_executable(versus 
     main.c 
-    drawing.h 
-    drawing.c)
+    editor.c)
 
 target_link_libraries(versus raylib)

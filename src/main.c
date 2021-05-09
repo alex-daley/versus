@@ -1,6 +1,6 @@
 #include <math.h>
 #include <raylib.h>
-#include "drawing.h"
+#include "editor.h"
 
 #define MIN(a, b) (a < b ? a : b)
 
@@ -91,8 +91,7 @@ int main()
         // https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
         while (accumulator >= targetFrameTime)
         {
-            // TODO: Update game here
-
+            UpdateEditor();
             accumulator -= targetFrameTime;
         }
 
@@ -101,8 +100,9 @@ int main()
 
         BeginTextureMode(*renderTarget);
         ClearBackground(BLACK);
-        DrawGrid(20, 15, 16);
+        DrawEditor();
         EndTextureMode();
+        
         DrawRenderTarget(renderTarget);
 
         EndDrawing();
