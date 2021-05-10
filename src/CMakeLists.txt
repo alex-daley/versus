@@ -58,6 +58,7 @@ if(NOT raylib_FOUND)
 endif()
 
 add_executable(versus 
+    content.c
     main.c 
     editor.c
     grid.c)

@@ -1,5 +1,6 @@
 #include <math.h>
 #include <raylib.h>
+#include "content.h"
 #include "editor.h"
 
 #define MIN(a, b) (a < b ? a : b)
@@ -47,6 +48,7 @@ int main()
     InitWindow(1280, 720, "Versus");
 
     RenderTexture renderTarget = LoadRenderTexture(320, 240);
+    Content* content = LoadContent();
     double accumulator = 0.0;
 
     while (!WindowShouldClose())
@@ -78,6 +80,7 @@ int main()
         EndDrawing();
     }
 
+    UnloadContent(content);
     UnloadRenderTexture(renderTarget);
     CloseWindow();
     
