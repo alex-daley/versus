@@ -3,39 +3,33 @@
 #include "editor.h"
 
 #define MIN(a, b) (a < b ? a : b)
+#define TARGET_FRAMERATE 60
+#define TARGET_FRAMETIME 1.0 / TARGET_FRAMERATE
+#define LOGICAL_W 320
+#define LOGICAL_H 240
 
-static const char* title = "Versus";
-
-static const double targetFrameTime = 1.0 / 60.0;
-static const int targetFrameRate = 60;
-static const int flags = FLAG_VSYNC_HINT;
-
-static const int nativeWidth  = 320;
-static const int nativeHeight = 240;
-static const int screenWidth  = 1280;
-static const int screenHeight = 720;
-
-typedef struct Resources
+static void Present(const RenderTexture* renderTarget)
 {
-    RenderTexture renderTarget;
-} Resources;
+    // Scale game render texture to window size.
+    float cx = (float)GetScreenWidth ();
+    float cy = (float)GetScreenHeight();
+    float scale = MIN(cx / LOGICAL_W, cy / LOGICAL_H);
 
-static Resources Initialise()
-{
-    SetConfigFlags(flags);
-    SetTargetFPS(targetFrameRate);
-    InitWindow(screenWidth, screenHeight, title);
+    Rectangle source = { 0.0f,  0.0f,  LOGICAL_W,  -LOGICAL_H };
+    Rectangle destination = {
+        (cx - ((float)LOGICAL_W * scale)) / 2.0f,
+        (cy - ((float)LOGICAL_H * scale)) / 2.0f,
+        LOGICAL_W* scale,
+        LOGICAL_H* scale
+    };
 
-    Resources resources = { 0 };
-    resources.renderTarget = LoadRenderTexture(nativeWidth, nativeHeight);
-
-    return resources;
-}
-
-static void Shutdown(Resources* resources)
-{
-    UnloadRenderTexture(resources->renderTarget);
-    CloseWindow();
+    DrawTexturePro(
+        renderTarget->texture,
+        source,
+        destination,
+        (Vector2) { 0.0f, 0.0f },
+        0.0f,
+        WHITE);
 }
 
 static double SnapFrameTime(double frameTime, double fps)
@@ -46,41 +40,18 @@ static double SnapFrameTime(double frameTime, double fps)
         : frameTime;
 }
 
-static void DrawRenderTarget(const RenderTexture* target)
-{
-    // Scale native game resolution to window resolution.
-
-    float cx = (float)GetScreenWidth();
-    float cy = (float)GetScreenHeight();
-    float scale = MIN(cx / nativeWidth, cy / nativeHeight);
-
-    Rectangle source = { 0.0f,  0.0f,  nativeWidth,  -nativeHeight };
-    Rectangle destination = {
-        (cx - ((float)nativeWidth  * scale)) / 2.0f,
-        (cy - ((float)nativeHeight * scale)) / 2.0f,
-        nativeWidth * scale,
-        nativeHeight * scale
-    };
-
-    // Draw
-
-    DrawTexturePro(
-        target->texture,
-        source,
-        destination,
-        (Vector2) { 0.0f, 0.0f },
-        0.0f,
-        WHITE);
-}
-
 int main()
 {
-    Resources resources = Initialise();
-    RenderTexture* renderTarget = &resources.renderTarget;
+    SetConfigFlags(FLAG_VSYNC_HINT);
+    SetTargetFPS(TARGET_FRAMERATE);
+    InitWindow(1280, 720, "Versus");
 
+    RenderTexture renderTarget = LoadRenderTexture(320, 240);
     double accumulator = 0.0;
+
     while (!WindowShouldClose())
     {
+        // https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
         double frameTime = GetFrameTime();
         frameTime = SnapFrameTime(frameTime, 60.0);
         frameTime = SnapFrameTime(frameTime, 30.0);
@@ -88,27 +59,27 @@ int main()
         frameTime = SnapFrameTime(frameTime, 15.0);
         accumulator += frameTime;
 
-        // https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
-        while (accumulator >= targetFrameTime)
+        
+        while (accumulator >= TARGET_FRAMETIME)
         {
             UpdateEditor();
-            accumulator -= targetFrameTime;
+            accumulator -= TARGET_FRAMETIME;
         }
 
         BeginDrawing();
         ClearBackground(BLACK);
 
-        BeginTextureMode(*renderTarget);
+        BeginTextureMode(renderTarget);
         ClearBackground(BLACK);
         DrawEditor();
         EndTextureMode();
         
-        DrawRenderTarget(renderTarget);
-
+        Present(&renderTarget);
         EndDrawing();
     }
 
-    Shutdown(&resources);
-
+    UnloadRenderTexture(renderTarget);
+    CloseWindow();
+    
     return 0;
 }
