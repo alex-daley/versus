@@ -9,12 +9,27 @@
 #define LOGICAL_W 320
 #define LOGICAL_H 240
 
+static float GameToScreenScale()
+{
+    float cx = (float)GetScreenWidth();
+    float cy = (float)GetScreenHeight();
+    return MIN(cx / LOGICAL_W, cy / LOGICAL_H);
+}
+
+static Vector2 GetVirtualMousePosition()
+{
+    float scale = GameToScreenScale();
+    Vector2 mouse = GetMousePosition();
+    mouse.x = (mouse.x - (GetScreenWidth()  - (LOGICAL_W * scale)) * 0.5f) / scale;
+    mouse.y = (mouse.y - (GetScreenHeight() - (LOGICAL_H * scale)) * 0.5f) / scale;
+    return mouse;
+}
+
 static void Present(const RenderTexture* renderTarget)
 {
-    // Scale game render texture to window size.
-    float cx = (float)GetScreenWidth ();
+    float cx = (float)GetScreenWidth();
     float cy = (float)GetScreenHeight();
-    float scale = MIN(cx / LOGICAL_W, cy / LOGICAL_H);
+    float scale = GameToScreenScale();
 
     Rectangle source = { 0.0f,  0.0f,  LOGICAL_W,  -LOGICAL_H };
     Rectangle destination = {
@@ -61,10 +76,10 @@ int main()
         frameTime = SnapFrameTime(frameTime, 15.0);
         accumulator += frameTime;
 
-        
+        Vector2 mouse = GetVirtualMousePosition();
         while (accumulator >= TARGET_FRAMETIME)
         {
-            UpdateEditor();
+            UpdateEditor(mouse);
             accumulator -= TARGET_FRAMETIME;
         }
 
