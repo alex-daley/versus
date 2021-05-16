@@ -61,7 +61,7 @@ add_executable(versus
     content.c
     main.c 
     editor.c
-    grid.c)
+    debug.c)
 
 target_link_libraries(versus raylib)
 

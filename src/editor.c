@@ -1,5 +1,5 @@
 #include "editor.h"
-#include "grid.h"
+#include "debug.h"
 #include <math.h>
 #include <raylib.h>
 
@@ -44,6 +44,6 @@ void DrawEditor()
 {
     if (editor.drawGrid)
     {
-        DrawGrid2D(GRID_COLUMNS, GRID_ROWS, GRID_SPACING);
+        DebugGrid(GRID_COLUMNS, GRID_ROWS, GRID_SPACING);
     }
 }

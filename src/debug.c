@@ -1,17 +1,17 @@
-#include "grid.h"
+#include "debug.h"
 #include "raylib.h"
 
 static const Color gridColour = { 80, 80, 80, 255 };
 static const float gridThickness = 1.0f;
 
-void DrawGrid2D(int columns, int rows, int spacing)
+void DebugGrid(int columns, int rows, int spacing)
 {
-    const int width = columns * spacing;
-    const int height = rows * spacing;
+    const float width  = (float)columns * spacing;
+    const float height = (float)rows * spacing;
     const float offset = gridThickness / 2.0f;
 
     // Border.
-    DrawRectangleLinesEx((Rectangle) { 0, 0, width, height }, 1, gridColour);
+    DrawRectangleLinesEx((Rectangle) { 0.0f, 0.0f, width, height }, 1, gridColour);
 
     // Rows.
     for (int y = 0; y < rows; y++)
