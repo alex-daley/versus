@@ -1,6 +1,7 @@
 #include <math.h>
 #include <raylib.h>
 #include "content.h"
+#include "tilegrid.h"
 #include "editor.h"
 
 #define MIN(a, b) (a < b ? a : b)
@@ -64,6 +65,8 @@ int main()
 
     RenderTexture renderTarget = LoadRenderTexture(320, 240);
     Content* content = LoadContent();
+    TileGrid tileGrid = LoadTileGrid(20, 15, 16);
+
     double accumulator = 0.0;
 
     while (!WindowShouldClose())
@@ -79,7 +82,7 @@ int main()
         Vector2 mouse = GetVirtualMousePosition();
         while (accumulator >= TARGET_FRAMETIME)
         {
-            UpdateEditor(mouse);
+            UpdateEditor(&tileGrid, mouse);
             accumulator -= TARGET_FRAMETIME;
         }
 
@@ -88,13 +91,14 @@ int main()
 
         BeginTextureMode(renderTarget);
         ClearBackground(BLACK);
-        DrawEditor();
+        DrawEditor(tileGrid);
         EndTextureMode();
         
         Present(&renderTarget);
         EndDrawing();
     }
 
+    UnloadTileGrid(&tileGrid);
     UnloadContent(content);
     UnloadRenderTexture(renderTarget);
     CloseWindow();
