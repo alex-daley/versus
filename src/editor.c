@@ -15,38 +15,36 @@ static int RoundTo(int value, int multiple)
     return value - value % multiple;
 }
 
-void UpdateEditor(TileGrid* tileGrid, Vector2 mousePosition)
+static bool TileMouseOver(TileGrid grid, Vector2 cursor, int* x, int* y)
+{
+    if (cursor.x < 0 || cursor.y < 0) 
+        return false;
+
+    int cellSize = grid.cellSize;
+    *x = RoundTo((int)cursor.x, cellSize) / cellSize;
+    *y = RoundTo((int)cursor.y, cellSize) / cellSize; 
+
+    return *x < grid.columns && *y < grid.rows;
+}
+
+void UpdateEditor(TileGrid* grid, Vector2 cursor)
 {
     if (IsKeyPressed(KEY_F3))
     {
         editor.drawGrid = !editor.drawGrid;
     }
 
-    if (mousePosition.x > 0 && mousePosition.y > 0)
+    int x = 0;
+    int y = 0;
+    if (TileMouseOver(*grid, cursor, &x, &y))
     {
+        int* tile = grid->tiles[x + grid->columns * y];
 
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
-        {
-            int x = RoundTo((int)mousePosition.x, tileGrid->cellSize) / tileGrid->cellSize;
-            int y = RoundTo((int)mousePosition.y, tileGrid->cellSize) / tileGrid->cellSize;
-
-            if (x < tileGrid->columns && y < tileGrid->rows)
-            {
-                tileGrid->tiles[x + tileGrid->columns * y] = 1;
-            }
-        }
+            *tile = 1;
         else if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON))
-        {
-            int x = RoundTo((int)mousePosition.x, tileGrid->cellSize) / tileGrid->cellSize;
-            int y = RoundTo((int)mousePosition.y, tileGrid->cellSize) / tileGrid->cellSize;
-
-            if (x < tileGrid->columns && y < tileGrid->rows)
-            {
-                tileGrid->tiles[x + tileGrid->columns * y] = 0;
-            }
-        }
+            *tile = 0;
     }
-
 }
 
 void DrawEditor(TileGrid tileGrid)
