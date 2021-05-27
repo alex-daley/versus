@@ -9,10 +9,8 @@ typedef struct TileGrid
     int* tiles;
 } TileGrid;
 
-TileGrid LoadTileGrid(int cellSize);
-TileGrid LoadTileGridFromFile(int cellSize, const char* filepath);
+TileGrid LoadTileGrid(const char* fileName);
 void UnloadTileGrid(TileGrid* tileGrid);
-
-void WriteTileGrid(TileGrid* tileGrid, const char* filepath);
+void WriteTileGrid(TileGrid* tileGrid, const char* fileName);
 
 #endif

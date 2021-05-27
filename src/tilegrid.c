@@ -3,39 +3,62 @@
 #include <raylib.h>
 #include "tilegrid.h"
 
-#define COLUMNS 20
+#define COLS 20
 #define ROWS 15
-#define TILE_COUNT COLUMNS * ROWS
+#define TILE_PIXEL_WIDTH 16
+#define TILE_COUNT COLS * ROWS
 
-TileGrid LoadTileGrid(int cellSize)
+static TileGrid AllocateTileGrid()
 {
     TileGrid tileGrid = { 0 };
-    tileGrid.cellSize = cellSize;
-    tileGrid.columns = COLUMNS;
+    tileGrid.cellSize = TILE_PIXEL_WIDTH;
+    tileGrid.columns = COLS;
     tileGrid.rows = ROWS;
     tileGrid.tiles = calloc((size_t)TILE_COUNT, sizeof(int));
     return tileGrid;
 }
 
-TileGrid LoadTileGridFromFile(int cellSize, const char* filepath)
+static bool IsTile(int id)
 {
-    TileGrid tileGrid = LoadTileGrid(cellSize);
-    char* text = LoadFileText(filepath);
+    return id == 0 || id == 1;
+}
 
-    if (!text)
+static int ToInt(char c)
+{
+    return c - '0';
+}
+
+TileGrid LoadTileGrid(const char* fileName)
+{
+    TileGrid grid = AllocateTileGrid();
+
+    if (!FileExists(fileName))
     {
-        TraceLog(LOG_ERROR, "Failed to load TileGrid, falling back to empty grid");
-        return tileGrid;
+        TraceLog(LOG_WARNING, "%s not found", fileName);
+        return grid;
     }
 
+    char* text = LoadFileText(fileName);
     for (size_t i = 0; i < TILE_COUNT; ++i)
     {
-        tileGrid.tiles[i] = text[i] - '0';
+        int tile = ToInt(text[i]);
+
+        if (!IsTile(tile))
+        {
+            TraceLog(LOG_WARNING, "Unknown tile id: %c at position %i in file %s", text[i], i, fileName);
+            
+            UnloadTileGrid(&grid);
+            UnloadFileText(text);
+            
+            return AllocateTileGrid();
+        }
+    
+        grid.tiles[i] = tile;
     }
 
     UnloadFileText(text);
 
-    return tileGrid;
+    return grid;
 }
 
 void UnloadTileGrid(TileGrid* tileGrid)
