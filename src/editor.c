@@ -34,11 +34,16 @@ void UpdateEditor(TileGrid* grid, Vector2 cursor)
         editor.drawGrid = !editor.drawGrid;
     }
 
+    if (IsKeyPressed(KEY_F5))
+    {
+        WriteTileGrid(grid, "./level.txt");
+    }
+
     int x = 0;
     int y = 0;
     if (TileMouseOver(*grid, cursor, &x, &y))
     {
-        int* tile = grid->tiles[x + grid->columns * y];
+        int* tile = &grid->tiles[x + grid->columns * y];
 
         if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
             *tile = 1;

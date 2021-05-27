@@ -65,7 +65,7 @@ int main()
 
     RenderTexture renderTarget = LoadRenderTexture(320, 240);
     Content* content = LoadContent();
-    TileGrid tileGrid = LoadTileGrid(20, 15, 16);
+    TileGrid tileGrid = LoadTileGridFromFile(16, "./level.txt");
 
     double accumulator = 0.0;
 
