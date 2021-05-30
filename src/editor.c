@@ -1,6 +1,7 @@
 #include "editor.h"
 #include "debug.h"
 #include "drawing.h"
+#include "tilegrid_serialisation.h"
 #include <math.h>
 #include <raylib.h>
 

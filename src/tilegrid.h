@@ -17,10 +17,6 @@ typedef struct TilePosition
     int y;
 } TilePosition;
 
-TileGrid LoadTileGrid(const char* fileName);
-void UnloadTileGrid(TileGrid* tileGrid);
-void WriteTileGrid(TileGrid* tileGrid);
-
 Vector2 TileToWorldPoint(const TileGrid* tileGrid, int x, int y);
 TilePosition WorldToTilePoint(const TileGrid* tileGrid, Vector2 position);
 int GetTileAt(const TileGrid* tileGrid, TilePosition position);

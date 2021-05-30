@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "content.h"
+#include "tilegrid_serialisation.h"
 
 Content* LoadContent()
 {
