@@ -20,7 +20,13 @@ static void DrawTileGrid(const TileGrid* tileGrid)
     }
 }
 
+static void DrawPlayer(const Player* player)
+{
+    DrawRectangle((int)player->x, (int)player->y, player->width, player->height, RED);
+}
+
 void DrawWorld(const World* world)
 {
     DrawTileGrid(&world->tileGrid);
+    DrawPlayer(&world->player);
 }

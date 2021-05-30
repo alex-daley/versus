@@ -61,6 +61,7 @@ add_executable(versus
     content.c
     debug.c 
     drawing.c 
+    game.c
     editor.c
     main.c 
     tilegrid.c 

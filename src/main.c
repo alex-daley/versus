@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include "content.h"
 #include "drawing.h"
+#include "game.h"
 #include "editor.h"
 #include "tilegrid.h"
 #include "world.h"
@@ -67,9 +68,7 @@ int main()
 
     RenderTexture renderTarget = LoadRenderTexture(320, 240);
     Content* content = LoadContent();
-    
-    World world = { 0 };
-    world.tileGrid = content->tileGrid;
+    Game game = InitGame(content->tileGrid);
 
     double accumulator = 0.0;
 
@@ -87,6 +86,7 @@ int main()
         while (accumulator >= TARGET_FRAMETIME)
         {
             UpdateEditor(&content->tileGrid, mouse);
+            UpdateGame(&game);
             accumulator -= TARGET_FRAMETIME;
         }
 
@@ -96,8 +96,8 @@ int main()
         BeginTextureMode(renderTarget);
         ClearBackground(BLACK);
 
-        DrawWorld(&world);
-        DrawEditor(&world);
+        DrawWorld(&game.world);
+        DrawEditor(&game.world);
         
         EndTextureMode();
         
