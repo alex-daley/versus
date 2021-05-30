@@ -1,7 +1,7 @@
 #ifndef VERSUS_DRAWING_H
 #define VERSUS_DRAWING_H
-#include "tilegrid.h"
+#include "world.h"
 
-void DrawTileGrid(const TileGrid* tileGrid);
+void DrawWorld(const World* world);
 
 #endif

@@ -53,9 +53,9 @@ void UpdateEditor(TileGrid* grid, Vector2 cursor)
     }
 }
 
-void DrawEditor(const TileGrid* tileGrid)
+void DrawEditor(const World* world)
 {
-    DrawTileGrid(tileGrid);
+    TileGrid* tileGrid = &world->tileGrid;
 
     if (editor.drawGrid)
     {

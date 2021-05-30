@@ -64,7 +64,7 @@ add_executable(versus
     editor.c
     main.c 
     tilegrid.c 
-    )
+    world.c)
 
 target_link_libraries(versus raylib)
 

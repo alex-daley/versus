@@ -1,7 +1,7 @@
 #include <raylib.h>
 #include "drawing.h"
 
-void DrawTileGrid(const TileGrid* tileGrid)
+static void DrawTileGrid(const TileGrid* tileGrid)
 {
     for (int y = 0; y < tileGrid->rows; y++)
     {
@@ -18,4 +18,9 @@ void DrawTileGrid(const TileGrid* tileGrid)
             }
         }
     }
+}
+
+void DrawWorld(const World* world)
+{
+    DrawTileGrid(&world->tileGrid);
 }

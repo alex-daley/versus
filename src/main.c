@@ -1,8 +1,10 @@
 #include <math.h>
 #include <raylib.h>
 #include "content.h"
-#include "tilegrid.h"
+#include "drawing.h"
 #include "editor.h"
+#include "tilegrid.h"
+#include "world.h"
 
 #define MIN(a, b) (a < b ? a : b)
 #define TARGET_FRAMERATE 60
@@ -66,6 +68,9 @@ int main()
     RenderTexture renderTarget = LoadRenderTexture(320, 240);
     Content* content = LoadContent();
     
+    World world = { 0 };
+    world.tileGrid = content->tileGrid;
+
     double accumulator = 0.0;
 
     while (!WindowShouldClose())
@@ -90,7 +95,10 @@ int main()
 
         BeginTextureMode(renderTarget);
         ClearBackground(BLACK);
-        DrawEditor(&content->tileGrid);
+
+        DrawWorld(&world);
+        DrawEditor(&world);
+        
         EndTextureMode();
         
         Present(&renderTarget);
