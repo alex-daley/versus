@@ -17,7 +17,7 @@ Game InitGame(TileGrid tileGrid)
     game.world.player = (Player) {
         .x = startingPosition.x,
         .y = startingPosition.y,
-        .width = 12,
+        .width = 16,
         .height = 16
     };
     
@@ -40,17 +40,23 @@ void UpdateGame(Game* game)
     // Player's origin is the top left corner. 
     // If we are moving right, we need to start checking for collisions from the right.
 
+    if (velocityX == 0.0f)
+        return;
+
     if (Sign(velocityX) == 1)
     {
-        // HACK: Why do we need the -1?
-       desired.x += player->width - 1;
+       desired.x += (float)player->width;
     }
 
     TileGrid* grid = &game->world.tileGrid;
     TilePosition tilePosition = WorldToTilePoint(grid, desired);
-    TraceLog(LOG_INFO, "%i %i", tilePosition.x, tilePosition.y);
+    
     if (GetTileAt(grid, tilePosition) == 0)
     {
         player->x += velocityX;
+    }
+    else
+    {
+        player->x = TileToWorldPoint(grid, (tilePosition.x - Sign(velocityX)), tilePosition.y).x;
     }
 }
