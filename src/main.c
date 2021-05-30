@@ -66,9 +66,6 @@ int main()
     RenderTexture renderTarget = LoadRenderTexture(320, 240);
     Content* content = LoadContent();
     
-    const char* tileGridFile = "./level.txt";
-    TileGrid tileGrid = LoadTileGrid(tileGridFile);
-
     double accumulator = 0.0;
 
     while (!WindowShouldClose())
@@ -84,7 +81,7 @@ int main()
         Vector2 mouse = GetVirtualMousePosition();
         while (accumulator >= TARGET_FRAMETIME)
         {
-            UpdateEditor(&tileGrid, tileGridFile, mouse);
+            UpdateEditor(&content->tileGrid, mouse);
             accumulator -= TARGET_FRAMETIME;
         }
 
@@ -93,14 +90,13 @@ int main()
 
         BeginTextureMode(renderTarget);
         ClearBackground(BLACK);
-        DrawEditor(tileGrid);
+        DrawEditor(content->tileGrid);
         EndTextureMode();
         
         Present(&renderTarget);
         EndDrawing();
     }
 
-    UnloadTileGrid(&tileGrid);
     UnloadContent(content);
     UnloadRenderTexture(renderTarget);
     CloseWindow();

@@ -15,6 +15,7 @@ static TileGrid AllocateTileGrid()
     tileGrid.columns = COLS;
     tileGrid.rows = ROWS;
     tileGrid.tiles = calloc((size_t)TILE_COUNT, sizeof(int));
+    tileGrid.fileName = 0;
     return tileGrid;
 }
 
@@ -31,6 +32,7 @@ static int ToInt(char c)
 TileGrid LoadTileGrid(const char* fileName)
 {
     TileGrid grid = AllocateTileGrid();
+    grid.fileName = fileName;
 
     if (!FileExists(fileName))
     {
@@ -67,8 +69,14 @@ void UnloadTileGrid(TileGrid* tileGrid)
     tileGrid->columns = tileGrid->rows = tileGrid->cellSize = 0;
 }
 
-void WriteTileGrid(TileGrid* tileGrid, const char* filepath)
+void WriteTileGrid(TileGrid* tileGrid)
 {
+    if (!tileGrid->fileName)
+    {
+        TraceLog(LOG_WARNING, "Not saving tile grid because fileName was null");
+        return;
+    }
+
     char* buffer = malloc((TILE_COUNT + 1) * sizeof(char));
 
     assert(buffer);
@@ -86,6 +94,6 @@ void WriteTileGrid(TileGrid* tileGrid, const char* filepath)
     
     #pragma warning( pop )
 
-    SaveFileText(filepath, buffer);
+    SaveFileText(tileGrid->fileName, buffer);
     free(buffer);
 }

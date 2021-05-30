@@ -7,10 +7,11 @@ typedef struct TileGrid
     int rows;
     int cellSize;
     int* tiles;
+    const char* fileName;
 } TileGrid;
 
 TileGrid LoadTileGrid(const char* fileName);
 void UnloadTileGrid(TileGrid* tileGrid);
-void WriteTileGrid(TileGrid* tileGrid, const char* fileName);
+void WriteTileGrid(TileGrid* tileGrid);
 
 #endif

@@ -3,7 +3,7 @@
 #include "tilegrid.h"
 #include <raylib.h>
 
-void UpdateEditor(TileGrid* tileGrid, const char* tileGridFile, Vector2 mousePosition);
+void UpdateEditor(TileGrid* tileGrid, Vector2 mousePosition);
 void DrawEditor(TileGrid tileGrid);
 
 #endif

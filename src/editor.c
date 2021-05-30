@@ -27,7 +27,7 @@ static bool TileMouseOver(TileGrid grid, Vector2 cursor, int* x, int* y)
     return *x < grid.columns && *y < grid.rows;
 }
 
-void UpdateEditor(TileGrid* grid, const char* tileGridFile, Vector2 cursor)
+void UpdateEditor(TileGrid* grid, Vector2 cursor)
 {
     if (IsKeyPressed(KEY_F3))
     {
@@ -36,7 +36,7 @@ void UpdateEditor(TileGrid* grid, const char* tileGridFile, Vector2 cursor)
 
     if (IsKeyPressed(KEY_F5))
     {
-        WriteTileGrid(grid, tileGridFile);
+        WriteTileGrid(grid);
     }
 
     int x = 0;
