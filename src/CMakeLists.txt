@@ -60,9 +60,11 @@ endif()
 add_executable(versus 
     content.c
     debug.c 
+    drawing.c 
     editor.c
     main.c 
-    tilegrid.c)
+    tilegrid.c 
+    )
 
 target_link_libraries(versus raylib)
 

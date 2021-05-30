@@ -90,7 +90,7 @@ int main()
 
         BeginTextureMode(renderTarget);
         ClearBackground(BLACK);
-        DrawEditor(content->tileGrid);
+        DrawEditor(&content->tileGrid);
         EndTextureMode();
         
         Present(&renderTarget);

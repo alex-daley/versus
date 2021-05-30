@@ -4,6 +4,6 @@
 #include <raylib.h>
 
 void UpdateEditor(TileGrid* tileGrid, Vector2 mousePosition);
-void DrawEditor(TileGrid tileGrid);
+void DrawEditor(const TileGrid* tileGrid);
 
 #endif
