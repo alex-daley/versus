@@ -1,13 +1,16 @@
 #ifndef VERSUS_GAME_H
 #define VERSUS_GAME_H
-#include "world.h"
+#include <raylib.h>
+#include "content.h"
+#include "player.h"
 
-typedef struct Game
-{
-    World world;
+typedef struct Game {
+    Content* content;
+    Player player;
 } Game;
 
-Game InitGame(TileGrid tileGrid);
+Game InitGame(Content* content);
 void UpdateGame(Game* game);
+void DrawGame(const Game* game);
 
 #endif

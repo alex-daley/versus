@@ -1,62 +1,61 @@
 #include <math.h>
 #include <raylib.h>
 #include "game.h"
+#include "player.h"
 
-static int Sign(float v)
+static void DrawTileGrid(const TileGrid* tileGrid)
 {
-    return v < 0.0f ? -1 : 1;
+    for (int y = 0; y < tileGrid->rows; y++)
+    {
+        for (int x = 0; x < tileGrid->columns; x++)
+        {
+            if (tileGrid->tiles[x + tileGrid->columns * y] == 1)
+            {
+                DrawRectangle(
+                    x * tileGrid->cellSize,
+                    y * tileGrid->cellSize,
+                    tileGrid->cellSize,
+                    tileGrid->cellSize,
+                    WHITE);
+            }
+        }
+    }
 }
 
-Game InitGame(TileGrid tileGrid)
+static void DrawPlayer(const Player* player)
+{
+    DrawRectangleRec(player->rect, RED);
+}
+
+Game InitGame(Content* content)
 {
     Game game = { 0 };
-    game.world.tileGrid = tileGrid;
-    
-    Vector2 startingPosition = TileToWorldPoint(&tileGrid, tileGrid.columns / 2, tileGrid.rows / 2);
+    game.content = content;
 
-    game.world.player = (Player) {
-        .x = startingPosition.x,
-        .y = startingPosition.y,
-        .width = 16,
-        .height = 16
+    TileGrid grid = content->tileGrid;
+    Vector2 centre = TileToWorldPoint(&grid, grid.columns / 2, grid.rows / 2);
+    game.player = (Player)
+    {
+        .rect.x = centre.x,
+        .rect.y = centre.y,
+        .rect.width = 16,
+        .rect.height = 16,
+        .velocity = (Vector2) { 0 },
+        .isGrounded = true
     };
-    
+
     return game;
 }
 
 void UpdateGame(Game* game)
 {
-    float velocityX = 0;
-    if (IsKeyDown(KEY_A)) velocityX -= 2.0f;
-    if (IsKeyDown(KEY_D)) velocityX += 2.0f;
+    Player* player = &game->player;
+    TileGrid* grid = &game->content->tileGrid;
+    UpdatePlayer(player, grid);
+}
 
-    Player* player = &game->world.player;
-
-    Vector2 desired = { 
-        player->x + velocityX, 
-        player->y 
-    };
-
-    // Player's origin is the top left corner. 
-    // If we are moving right, we need to start checking for collisions from the right.
-
-    if (velocityX == 0.0f)
-        return;
-
-    if (Sign(velocityX) == 1)
-    {
-       desired.x += (float)player->width;
-    }
-
-    TileGrid* grid = &game->world.tileGrid;
-    TilePosition tilePosition = WorldToTilePoint(grid, desired);
-    
-    if (GetTileAt(grid, tilePosition) == 0)
-    {
-        player->x += velocityX;
-    }
-    else
-    {
-        player->x = TileToWorldPoint(grid, (tilePosition.x - Sign(velocityX)), tilePosition.y).x;
-    }
+void DrawGame(const Game* game) 
+{
+    DrawTileGrid(&game->content->tileGrid);
+    DrawPlayer(&game->player);
 }

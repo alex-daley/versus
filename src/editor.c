@@ -1,6 +1,5 @@
 #include "editor.h"
 #include "debug.h"
-#include "drawing.h"
 #include "tilegrid_serialisation.h"
 #include <math.h>
 #include <raylib.h>
@@ -54,10 +53,8 @@ void UpdateEditor(TileGrid* grid, Vector2 cursor)
     }
 }
 
-void DrawEditor(const World* world)
+void DrawEditor(const TileGrid* tileGrid)
 {
-    const TileGrid* tileGrid = &world->tileGrid;
-
     if (editor.drawGrid)
     {
         DebugGrid(tileGrid->columns, tileGrid->rows, tileGrid->cellSize);
