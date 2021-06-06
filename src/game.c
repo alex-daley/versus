@@ -24,7 +24,17 @@ static void DrawTileGrid(const TileGrid* tileGrid)
 
 static void DrawPlayer(const Player* player)
 {
-    DrawRectangleRec(player->rect, RED);
+    Actor actor = player->actor;
+
+    Rectangle rect =
+    {
+        actor.minX,
+        actor.minY,
+        actor.maxX - actor.minX,
+        actor.maxY - actor.minY
+    };
+
+    DrawRectangleRec(rect, RED);
 }
 
 Game InitGame(Content* content)
@@ -36,12 +46,12 @@ Game InitGame(Content* content)
     Vector2 centre = TileToWorldPoint(&grid, grid.columns / 2, grid.rows / 2);
     game.player = (Player)
     {
-        .rect.x = centre.x,
-        .rect.y = centre.y,
-        .rect.width = 16,
-        .rect.height = 16,
+        .actor.minX = centre.x,
+        .actor.minY = centre.y,
+        .actor.maxX = centre.x + 16,
+        .actor.maxY = centre.y + 16,
+        .actor.contacts = 0,
         .velocity = (Vector2) { 0 },
-        .isGrounded = true
     };
 
     return game;

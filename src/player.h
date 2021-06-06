@@ -2,12 +2,12 @@
 #define VERSUS_PLAYER_H
 #include <raylib.h>
 #include "tilegrid.h"
+#include "physics.h"
 
 typedef struct Player 
 {
-    Rectangle rect;
+    Actor actor;
     Vector2 velocity;
-    bool isGrounded;
 } Player;
 
 void UpdatePlayer(Player* player, const TileGrid* surroundings);

@@ -1,0 +1,10 @@
+#ifndef VERSUS_GAME_CONSTANTS_H
+#define VERSUS_GAME_CONSTANTS_H
+
+// One game tile is 16 by 16 pixels.
+#define TILE_SIZE_IN_PIXELS 16
+
+#define TARGET_FRAMERATE 60
+#define TARGET_FRAMETIME 1.0 / TARGET_FRAMERATE.0
+
+#endif

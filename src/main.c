@@ -2,12 +2,11 @@
 #include <raylib.h>
 #include "content.h"
 #include "game.h"
+#include "game_constants.h"
 #include "editor.h"
 #include "tilegrid.h"
 
 #define MIN(a, b) (a < b ? a : b)
-#define TARGET_FRAMERATE 60
-#define TARGET_FRAMETIME 1.0 / TARGET_FRAMERATE
 #define LOGICAL_W 320
 #define LOGICAL_H 240
 
