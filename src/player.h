@@ -8,6 +8,8 @@ typedef struct Player
 {
     Actor actor;
     Vector2 velocity;
+    int numFramesFalling;
+    int numFramesJumpHasBeenQueued;
 } Player;
 
 void UpdatePlayer(Player* player, const TileGrid* surroundings);

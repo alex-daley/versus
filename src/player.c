@@ -11,21 +11,23 @@
 #define GRAVITY_PER_FRAME GRAVITY * TARGET_FRAMETIME
 #define TAKEOFF_VELOCITY -(GRAVITY * JUMP_TIME_TO_APEX)
 
+#define FALLING_BUT_ALLOW_JUMPING_FRAMES 10
+#define FALLING_BUT_QUEUE_JUMP_FRAMES 10
+
 static inline int Sign(float v)
 {
     return v < 0.0f ? -1 : 1;
 }
 
+static void Jump(Player* player, const TileGrid* tiles)
+{
+    player->velocity.y = TAKEOFF_VELOCITY;
+    player->actor = PhysicsMoveY(*tiles, player->actor, player->velocity.y);
+}
+
 static void MoveX(Player* player, const TileGrid* tiles)
 {
     float velocity = 0.0f;
-
-    // TODO: Remove
-    TraceLog(LOG_INFO, "Left %i Right %i above %i below %i", 
-        (player->actor.contacts & CONTACT_LEFT ) != 0, 
-        (player->actor.contacts & CONTACT_RIGHT) != 0,
-        (player->actor.contacts & CONTACT_ABOVE) != 0,
-        (player->actor.contacts & CONTACT_BELOW) != 0);
 
     // TODO: Pass in the input.
     if (IsKeyDown(KEY_D))
@@ -58,15 +60,54 @@ static void MoveY(Player* player, const TileGrid* tiles)
         // TODO: Pass in input.
         if (IsKeyPressed(KEY_SPACE))
         {
-            player->velocity.y = TAKEOFF_VELOCITY;
-            player->actor = PhysicsMoveY(*tiles, player->actor, player->velocity.y);
+            Jump(player, tiles);
+        }
+        // Jump Buffering.
+        else if (
+            IsKeyDown(KEY_SPACE) && 
+            player->numFramesJumpHasBeenQueued != 0 &&
+            player->numFramesJumpHasBeenQueued <= FALLING_BUT_QUEUE_JUMP_FRAMES)
+        {
+            Jump(player, tiles);
+        }
+
+
+        player->numFramesFalling = 0;
+        player->numFramesJumpHasBeenQueued = 0;
+    }
+    else
+    {
+        player->numFramesFalling++;
+
+        if (
+            player->velocity.y >= 0.0f &&
+            player->numFramesFalling <= FALLING_BUT_ALLOW_JUMPING_FRAMES &&
+            IsKeyPressed(KEY_SPACE))
+        {
+            Jump(player, tiles);
+        }
+
+        if (IsKeyDown(KEY_SPACE))
+        {
+            player->numFramesJumpHasBeenQueued++;
+        }
+        else
+        {
+            player->numFramesJumpHasBeenQueued = 0;
+        }
+
+        if (IsKeyReleased(KEY_SPACE))
+        {
+            player->velocity.y *= 0.5f;
         }
     }
-    
+
     if (player->actor.contacts & CONTACT_ABOVE)
     {
         player->velocity.y = 0.0f;
     }
+
+    
 }
 
 void UpdatePlayer(Player* player, const TileGrid* tiles)
