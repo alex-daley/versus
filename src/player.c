@@ -10,6 +10,7 @@
 #define GRAVITY ((JUMP_HEIGHT * 2.0) / (pow(JUMP_TIME_TO_APEX, 2)))
 #define GRAVITY_PER_FRAME GRAVITY * TARGET_FRAMETIME
 #define TAKEOFF_VELOCITY -(GRAVITY * JUMP_TIME_TO_APEX)
+#define TERMINAL_VELOCITY -1.0 * TAKEOFF_VELOCITY
 
 #define FALLING_BUT_ALLOW_JUMPING_FRAMES 10
 #define FALLING_BUT_QUEUE_JUMP_FRAMES 10
@@ -48,7 +49,12 @@ static void MoveX(Player* player, const TileGrid* tiles)
 
 static void MoveY(Player* player, const TileGrid* tiles)
 {
-    player->velocity.y += GRAVITY_PER_FRAME;//* TARGET_FRAMETIME;
+    player->velocity.y += GRAVITY_PER_FRAME;
+    if (player->velocity.y > TERMINAL_VELOCITY)
+    {
+        player->velocity.y = TERMINAL_VELOCITY;
+    }
+
     player->actor.contacts &= ~CONTACT_BELOW;
 
     player->actor = PhysicsMoveY(*tiles, player->actor, player->velocity.y);
@@ -106,8 +112,6 @@ static void MoveY(Player* player, const TileGrid* tiles)
     {
         player->velocity.y = 0.0f;
     }
-
-    
 }
 
 void UpdatePlayer(Player* player, const TileGrid* tiles)
