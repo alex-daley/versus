@@ -20,7 +20,7 @@ typedef struct Actor
     Contact contacts;
 } Actor;
 
-Actor PhysicsMoveX(TileGrid tiles, Actor actor, float amount);
-Actor PhysicsMoveY(TileGrid tiles, Actor actor, float amount);
+Actor PhysicsMoveX(const TileGrid* tiles, Actor actor, float amount);
+Actor PhysicsMoveY(const TileGrid* tiles, Actor actor, float amount);
 
 #endif

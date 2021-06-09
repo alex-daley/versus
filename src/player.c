@@ -21,13 +21,13 @@ static inline int Sign(float v)
     return v < 0.0f ? -1 : 1;
 }
 
-static void Jump(Player* player, TileGrid tiles)
+static void Jump(Player* player, const TileGrid* tiles)
 {
     player->velocity.y = TAKEOFF;
     player->actor = PhysicsMoveY(tiles, player->actor, player->velocity.y);
 }
 
-static void MoveX(Player* player, TileGrid tiles)
+static void MoveX(Player* player, const TileGrid* tiles)
 {
     float velocity = 0.0f;
 
@@ -47,9 +47,9 @@ static void MoveX(Player* player, TileGrid tiles)
     player->actor = PhysicsMoveX(tiles, player->actor, velocity);
 }
 
-static void MoveY(Player* player, TileGrid tiles)
+static void MoveY(Player* player, const TileGrid* tiles)
 {
-    player->velocity.y += GRAVITY_STEP;
+    player->velocity.y += (float)GRAVITY_STEP;
 
     if (player->velocity.y > TERMINAL_VELOCITY)
     {
@@ -104,6 +104,6 @@ static void MoveY(Player* player, TileGrid tiles)
 
 void UpdatePlayer(Player* player, const TileGrid* tiles)
 {
-    MoveX(player, *tiles);
-    MoveY(player, *tiles);
+    MoveX(player, tiles);
+    MoveY(player, tiles);
 }

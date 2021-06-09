@@ -7,7 +7,7 @@ static inline int Sign(int v)
     return v < 0 ? -1 : 1;
 }
 
-Actor PhysicsMoveX(TileGrid tiles, Actor actor, float amount)
+Actor PhysicsMoveX(const TileGrid* tiles, Actor actor, float amount)
 {
     int move = (int)roundf(amount);
     if (move == 0)
@@ -22,18 +22,18 @@ Actor PhysicsMoveX(TileGrid tiles, Actor actor, float amount)
     };
 
     // Get the tile(s) at our desired position.
-    TilePosition minY = WorldToTilePoint(&tiles, desired);
+    TilePosition minY = WorldToTilePoint(tiles, desired);
     desired.y = actor.maxY - 1;
-    TilePosition maxY = WorldToTilePoint(&tiles, desired);
+    TilePosition maxY = WorldToTilePoint(tiles, desired);
 
     // Have we hit something?
-    if (GetTileAt(&tiles, minY) + GetTileAt(&tiles, maxY) != 0)
+    if (GetTileAt(tiles, minY) + GetTileAt(tiles, maxY) != 0)
     {   
         // Which tile have we hit?
-        TilePosition tile = GetTileAt(&tiles, minY) != 0 ? minY : maxY;
+        TilePosition tile = GetTileAt(tiles, minY) != 0 ? minY : maxY;
 
         // Snap to the tile adjacent to it.
-        Vector2 snapPoint = TileToWorldPoint(&tiles, (tile.x - sign), tile.y);
+        Vector2 snapPoint = TileToWorldPoint(tiles, (tile.x - sign), tile.y);
 
         int width = actor.maxX - actor.minX;
         actor.minX = (int)roundf(snapPoint.x);
@@ -55,7 +55,7 @@ Actor PhysicsMoveX(TileGrid tiles, Actor actor, float amount)
     return actor;
 }
 
-Actor PhysicsMoveY(TileGrid tiles, Actor actor, float amount)
+Actor PhysicsMoveY(const TileGrid* tiles, Actor actor, float amount)
 {
     int sign = Sign(amount);
 
@@ -66,18 +66,18 @@ Actor PhysicsMoveY(TileGrid tiles, Actor actor, float amount)
     };
 
     // Get the tile(s) at our desired position.
-    TilePosition minX = WorldToTilePoint(&tiles, desired);
+    TilePosition minX = WorldToTilePoint(tiles, desired);
     desired.x = actor.maxX - 1;
-    TilePosition maxX = WorldToTilePoint(&tiles, desired);
+    TilePosition maxX = WorldToTilePoint(tiles, desired);
 
     // Have we hit something?
-    if (GetTileAt(&tiles, minX) + GetTileAt(&tiles, maxX) != 0)
+    if (GetTileAt(tiles, minX) + GetTileAt(tiles, maxX) != 0)
     {
         // Which tile have we hit?
-        TilePosition tile = GetTileAt(&tiles, minX) != 0 ? minX : maxX;
+        TilePosition tile = GetTileAt(tiles, minX) != 0 ? minX : maxX;
         
         // Snap to the tile adjacent to it.
-        Vector2 snapPoint = TileToWorldPoint(&tiles, tile.x, (tile.y - sign));
+        Vector2 snapPoint = TileToWorldPoint(tiles, tile.x, (tile.y - sign));
 
         int height = actor.maxY - actor.minY;
         actor.minY = (int)roundf(snapPoint.y);
