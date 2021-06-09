@@ -17,13 +17,13 @@ Actor PhysicsMoveX(const TileGrid* tiles, Actor actor, float amount)
 
     Vector2 desired = 
     {
-        .x = (sign == 1 ? actor.maxX : actor.minX) + move,
-        .y = actor.minY + 1
+        .x = (float)((sign == 1 ? actor.maxX : actor.minX) + move),
+        .y = (float)(actor.minY + 1)
     };
 
     // Get the tile(s) at our desired position.
     TilePosition minY = WorldToTilePoint(tiles, desired);
-    desired.y = actor.maxY - 1;
+    desired.y = (float)(actor.maxY - 1);
     TilePosition maxY = WorldToTilePoint(tiles, desired);
 
     // Have we hit something?
@@ -57,17 +57,17 @@ Actor PhysicsMoveX(const TileGrid* tiles, Actor actor, float amount)
 
 Actor PhysicsMoveY(const TileGrid* tiles, Actor actor, float amount)
 {
-    int sign = Sign(amount);
+    int sign = Sign((int)amount);
 
     Vector2 desired =
     {
-        .x = actor.minX + 1,
-        .y = (sign == 1 ? actor.maxY : actor.minY) + amount
+        .x = (float)(actor.minX + 1),
+        .y = (float)((sign == 1 ? actor.maxY : actor.minY) + amount)
     };
 
     // Get the tile(s) at our desired position.
     TilePosition minX = WorldToTilePoint(tiles, desired);
-    desired.x = actor.maxX - 1;
+    desired.x = (float)(actor.maxX - 1);
     TilePosition maxX = WorldToTilePoint(tiles, desired);
 
     // Have we hit something?
@@ -88,6 +88,7 @@ Actor PhysicsMoveY(const TileGrid* tiles, Actor actor, float amount)
 
         return actor;
     }
+
     // Nothing here, we can move unconstrained.
     int move = (int)roundf(amount);
     
