@@ -3,7 +3,9 @@
 #include "physics.h"
 #include "game_constants.h"
 
-#define SPEED 2
+#define MAX_SPEED          (96.0f / powf(1.0f, 1.0f)) * TARGET_FRAMETIME
+#define ACCELERATION       MAX_SPEED
+#define AIR_MOVE_FACTOR    0.2f
 
 #define JUMP_TILES         3.0f
 #define JUMP_TIME          0.4f
@@ -29,22 +31,44 @@ static void Jump(Player* player, const TileGrid* tiles)
 
 static void MoveX(Player* player, const TileGrid* tiles)
 {
-    float velocity = 0.0f;
+    int direction = 0;
 
     if (IsKeyDown(KEY_D))
     {
-        velocity += SPEED;
+        direction += 1;
     }
     else if (IsKeyDown(KEY_A))
     {
-        velocity -= SPEED;
+        direction -= 1;
+    }
+
+    if (direction == 0)
+    {
+        player->velocity.x = 0.0f;
+    }
+    
+    TraceLog(LOG_INFO, "%f", player->velocity.x);
+
+    if (player->actor.contacts & CONTACT_BELOW)
+    {
+        player->velocity.x += ACCELERATION * direction;
     }
     else
     {
-        velocity = 0.0f;
+        player->velocity.x += ACCELERATION * AIR_MOVE_FACTOR * direction;
     }
 
-    player->actor = PhysicsMoveX(tiles, player->actor, velocity);
+    if (fabs(player->velocity.x) >= MAX_SPEED)
+    {
+        player->velocity.x = MAX_SPEED * direction;
+    }
+
+    player->actor = PhysicsMoveX(tiles, player->actor, player->velocity.x);
+
+    if ((player->actor.contacts & (CONTACT_LEFT | CONTACT_RIGHT)))
+    {
+        player->velocity.x = 0.0f;
+    }
 }
 
 static void MoveY(Player* player, const TileGrid* tiles)

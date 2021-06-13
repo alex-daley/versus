@@ -10,9 +10,6 @@ static inline int Sign(int v)
 Actor PhysicsMoveX(const TileGrid* tiles, Actor actor, float amount)
 {
     int move = (int)roundf(amount);
-    if (move == 0)
-        return actor;
-    
     int sign = Sign(move);
 
     Vector2 desired = 
