@@ -47,8 +47,6 @@ static void MoveX(Player* player, const TileGrid* tiles)
         player->velocity.x = 0.0f;
     }
     
-    TraceLog(LOG_INFO, "%f", player->velocity.x);
-
     if (player->actor.contacts & CONTACT_BELOW)
     {
         player->velocity.x += ACCELERATION * direction;
