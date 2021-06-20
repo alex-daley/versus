@@ -5,7 +5,7 @@
 
 #define MAX_SPEED          (96.0f / powf(1.0f, 1.0f)) * TARGET_FRAMETIME
 #define ACCELERATION       MAX_SPEED
-#define AIR_MOVE_FACTOR    0.2f
+#define AIR_MOVE_FACTOR    0.1f
 
 #define JUMP_TILES         3.0f
 #define JUMP_TIME          0.4f
@@ -29,11 +29,18 @@ static void Jump(Player* player, const TileGrid* tiles)
     player->actor = PhysicsMoveY(tiles, player->actor, player->velocity.y);
 }
 
+// TODO: Jump queueing for wall jumping.
+// TODO: Wall "stickiness".
+
 static void MoveX(Player* player, const TileGrid* tiles)
 {
     int direction = 0;
 
-    if (IsKeyDown(KEY_D))
+    if (player->wallJump)
+    {
+        direction = Sign(player->velocity.x);
+    }
+    else if (IsKeyDown(KEY_D))
     {
         direction += 1;
     }
@@ -41,7 +48,7 @@ static void MoveX(Player* player, const TileGrid* tiles)
     {
         direction -= 1;
     }
-
+    
     if (direction == 0)
     {
         player->velocity.x = 0.0f;
@@ -51,22 +58,21 @@ static void MoveX(Player* player, const TileGrid* tiles)
     {
         player->velocity.x += ACCELERATION * direction;
     }
+    else if (player->wallJump)
+    {
+        player->velocity.x = MAX_SPEED;
+    }
     else
     {
         player->velocity.x += ACCELERATION * AIR_MOVE_FACTOR * direction;
     }
 
-    if (fabs(player->velocity.x) >= MAX_SPEED)
+    if (fabs(player->velocity.x) > MAX_SPEED)
     {
         player->velocity.x = MAX_SPEED * direction;
     }
 
     player->actor = PhysicsMoveX(tiles, player->actor, player->velocity.x);
-
-    if ((player->actor.contacts & (CONTACT_LEFT | CONTACT_RIGHT)))
-    {
-        player->velocity.x = 0.0f;
-    }
 }
 
 static void MoveY(Player* player, const TileGrid* tiles)
@@ -100,6 +106,7 @@ static void MoveY(Player* player, const TileGrid* tiles)
             player->velocity.y = 0.0f;
         }
 
+        player->wallJump = false;
         player->jumpQueueFrames = 0;
         player->fallFrames = 0;
     }
@@ -116,10 +123,29 @@ static void MoveY(Player* player, const TileGrid* tiles)
             player->fallFrames <= LEEWAY_FRAMES)
         {
             Jump(player, tiles);
+
         }
         else if (IsKeyReleased(KEY_SPACE))
         {
             player->velocity.y *= 0.5f;
+        }
+
+        if (IsKeyPressed(KEY_SPACE) && (player->actor.contacts & (CONTACT_LEFT)))
+        {
+            player->velocity.x = MAX_SPEED;
+            Jump(player, tiles);
+            player->wallJump = true;
+        }
+        else if (IsKeyPressed(KEY_SPACE) && (player->actor.contacts & (CONTACT_RIGHT)))
+        {
+            player->velocity.x = -MAX_SPEED;
+            Jump(player, tiles);
+
+            player->wallJump = true;
+        }
+        else if (player->wallJump && player->velocity.y >= 0.0f)
+        {
+            player->wallJump = false;
         }
     }
 }
@@ -128,4 +154,6 @@ void UpdatePlayer(Player* player, const TileGrid* tiles)
 {
     MoveX(player, tiles);
     MoveY(player, tiles);
+
+    TraceLog(LOG_INFO, "x: %f, %f", player->velocity.x, player->velocity.y);
 }

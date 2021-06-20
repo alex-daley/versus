@@ -10,6 +10,7 @@ typedef struct Player
     Vector2 velocity;
     int jumpQueueFrames;
     int fallFrames;
+    bool wallJump;
 } Player;
 
 void UpdatePlayer(Player* player, const TileGrid* surroundings);
