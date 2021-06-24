@@ -5,7 +5,7 @@
 
 #define MAX_SPEED          (96.0f / powf(1.0f, 1.0f)) * TARGET_FRAMETIME
 #define ACCELERATION       MAX_SPEED
-#define AIR_MOVE_FACTOR    0.1f
+#define AIR_MOVE_FACTOR    0.2f
 
 #define JUMP_TILES         3.0f
 #define JUMP_TIME          0.4f
