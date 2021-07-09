@@ -58,15 +58,7 @@ if(NOT raylib_FOUND)
 endif()
 
 add_executable(versus 
-    content.c
-    debug.c      
-    game.c
-    editor.c
-    main.c 
-    player.c
-    physics.c
-    tilegrid.c 
-    tilegrid_serialisation.c)
+    main.c)
 
 target_link_libraries(versus raylib)
 
