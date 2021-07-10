@@ -1,7 +1,9 @@
 #include <math.h>
 #include <raylib.h>
+
 #include "drawing.h"
 #include "editor.h"
+#include "game.h"
 #include "tilemap.h"
 #include "tilemap_serialisation.h"
 
@@ -14,6 +16,7 @@ static const int targetFPS          = 60;
 static const double targetFrameTime = 1.0 / 60.0;
 static const char* title            = "Versus";
 static const char* tilemapFile      = "Versus.world";
+static const char* playerAtlasFile  = "export/player.png";
 
 static inline double Min(double a, double b) {
     return a < b ? a : b;
@@ -77,6 +80,8 @@ int main() {
 
     RenderTexture renderTarget = LoadRenderTexture(logicalWidth, logicalheight);
     Tilemap map = LoadTilemap(tilemapFile);
+    Texture playerAtlas = LoadTexture(playerAtlasFile);
+    Player player = LoadPlayer((logicalWidth / 2), (logicalheight / 2));
     Editor editor = { 0 };
 
     double frameAccumulator = 0.0;
@@ -98,6 +103,7 @@ int main() {
         
         ClearBackground(BLACK);
         DrawTilemap(map);
+        DrawPlayer(player, playerAtlas);
         DrawEditor(editor, map);
 
         EndTextureMode();
@@ -107,6 +113,7 @@ int main() {
 
     UnloadRenderTexture(renderTarget);
     UnloadTilemap(map);
+    UnloadTexture(playerAtlas);
     CloseWindow();
 
     return 0;

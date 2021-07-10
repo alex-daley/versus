@@ -60,6 +60,7 @@ endif()
 add_executable(versus 
     drawing.c
     editor.c
+    game.c
     main.c
     tilemap_serialisation.c)
 
