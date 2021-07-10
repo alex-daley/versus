@@ -47,14 +47,14 @@ void DrawTilemap(Tilemap map) {
 
 void DrawPlayer(Player player, Texture atlas) {
     Rectangle src = {
-        0, 0, 16, 24
+        0.0f, 0.0f, 16.0f, 24.0f
     };
 
     Rectangle dst = {
-        player.minX,
-        player.minY,
-        player.maxX - player.minX,
-        player.maxY - player.minY
+        (float)player.minX,
+        (float)player.minY,
+        (float)player.maxX - player.minX,
+        (float)player.maxY - player.minY
     };
 
     DrawTexturePro(atlas, src, dst, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
