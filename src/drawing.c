@@ -45,11 +45,21 @@ void DrawTilemap(Tilemap map) {
     }
 }
 
-void DrawPlayer(Player player, Texture atlas) {
-    Rectangle src = {
-        0.0f, 0.0f, 16.0f, 24.0f
-    };
+void DrawPlayer(Player player, Texture atlas, const Content* content) {
+    Animation currentAnimation = { 0 };
+    
+    switch (player.state) {
+        case PLAYER_IDLE:
+            currentAnimation = content->playerIdleAnimation;
+            break;
 
+        case PLAYER_RUNNING:
+            currentAnimation = content->playerMoveAnimation;
+            break;
+    }
+
+    Rectangle src = currentAnimation.rectangles[player.currentFrame];
+    
     Rectangle dst = {
         (float)player.minX,
         (float)player.minY,

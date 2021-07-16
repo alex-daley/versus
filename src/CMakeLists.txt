@@ -57,12 +57,13 @@ if(NOT raylib_FOUND)
     endif()
 endif()
 
-add_executable(versus 
+add_executable(versus
+    
     drawing.c
     editor.c
     game.c
     main.c
-    tilemap_serialisation.c)
+    tilemap_serialisation.c "content.c" "content.h")
 
 target_link_libraries(versus raylib)
 

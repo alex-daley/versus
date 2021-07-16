@@ -3,9 +3,11 @@
 #include <math.h>
 #include <raylib.h>
 
+#include "content.h"
 #include "drawing.h"
 #include "editor.h"
 #include "game.h"
+#include "player.h"
 #include "tilemap.h"
 #include "tilemap_serialisation.h"
 
@@ -109,6 +111,7 @@ int main() {
     InitWindow(defaultWidth, defaultHeight, title);
 
     Resources* resources = LoadResources();
+    Content* content = LoadContent();
     double frameAccumulator = 0.0;
 
     while (!WindowShouldClose()) {
@@ -116,10 +119,13 @@ int main() {
         // https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
         frameAccumulator += GetSnappedFrameTime();
         while (frameAccumulator >= targetFrameTime) {
+
+            UpdatePlayer(&resources->player, content);
             frameAccumulator -= targetFrameTime;
         }
 
         Vector2 cursor = GetVirtualMousePosition();
+
         UpdateEditor(&resources->editor, cursor, resources->map, tilemapFile);
 
         BeginDrawing();
@@ -128,7 +134,7 @@ int main() {
         
         ClearBackground(BLACK);
         DrawTilemap(resources->map);
-        DrawPlayer(resources->player, resources->playerAtlas);
+        DrawPlayer(resources->player, resources->playerAtlas, content);
         DrawEditor(resources->editor, resources->map);
 
         EndTextureMode();
@@ -137,6 +143,7 @@ int main() {
     }
 
     UnloadResources(resources);
+    UnloadContent(content);
     CloseWindow();
 
     return 0;
