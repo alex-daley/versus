@@ -26,6 +26,16 @@ Player LoadPlayer(int minX, int minY) {
     return player;
 }
 
-void UpdatePlayer(Player* player, Content* content) {
+void UpdatePlayer(Player* player, GameInput input, Content* content) {
     UpdateAnimator(player, content->playerMoveAnimation);
+
+    player->velocity = input.horizontal;
+
+    if (input.horizontal != 0) {
+        player->state = PLAYER_RUNNING;
+        player->flipX = input.horizontal == -1;
+    } 
+    else {
+        player->state = PLAYER_IDLE;
+    }
 }

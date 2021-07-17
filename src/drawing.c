@@ -60,12 +60,18 @@ void DrawPlayer(Player player, Texture atlas, const Content* content) {
 
     Rectangle src = currentAnimation.rectangles[player.currentFrame];
     
+    if (player.flipX) {
+        src.width = -src.width;
+    }
+
     Rectangle dst = {
         (float)player.minX,
         (float)player.minY,
         (float)player.maxX - player.minX,
         (float)player.maxY - player.minY
     };
+
+    DrawRectangleLinesEx(dst, 1, RED);
 
     DrawTexturePro(atlas, src, dst, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
 }

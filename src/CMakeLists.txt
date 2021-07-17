@@ -63,7 +63,7 @@ add_executable(versus
     editor.c
     game.c
     main.c
-    tilemap_serialisation.c)
+    tilemap_serialisation.c )
 
 target_link_libraries(versus raylib)
 

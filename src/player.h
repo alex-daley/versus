@@ -1,6 +1,6 @@
 #pragma once
 
-static const int playerWidth  = 24;
+static const int playerWidth  = 16;
 static const int playerHeight = 24;
 
 typedef enum PlayerState {
@@ -17,4 +17,7 @@ typedef struct Player {
     PlayerState state;
     int currentFrame;
     int frameCounter;
+    bool flipX;
+
+    int velocity;
 } Player;

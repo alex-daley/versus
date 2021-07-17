@@ -49,8 +49,8 @@ static void DrawPixelPerfect(Texture2D renderTarget) {
     Rectangle dst = {
         (float)((cx - ((double)logicalWidth  * scale)) / 2.0),
         (float)((cy - ((double)logicalHeight * scale)) / 2.0),
-        (float)logicalWidth  * scale,
-        (float)logicalHeight * scale
+        (float)((double)logicalWidth  * scale),
+        (float)((double)logicalHeight * scale)
     };
 
     DrawTexturePro(renderTarget, src, dst, 
@@ -85,6 +85,16 @@ static Vector2 GetVirtualMousePosition() {
     return mouse;
 }
 
+static GameInput GetInput() {
+    GameInput input = { 0 };
+
+    // TODO: Controller input.
+    if (IsKeyDown(KEY_D)) input.horizontal += 1;
+    if (IsKeyDown(KEY_A)) input.horizontal -= 1;
+
+    return input;
+}
+
 static Resources* LoadResources() {
     Resources* resources = malloc(sizeof(Resources));
     assert(resources);
@@ -112,6 +122,7 @@ int main() {
 
     Resources* resources = LoadResources();
     Content* content = LoadContent();
+    GameInput input = GetInput();
     double frameAccumulator = 0.0;
 
     while (!WindowShouldClose()) {
@@ -120,11 +131,12 @@ int main() {
         frameAccumulator += GetSnappedFrameTime();
         while (frameAccumulator >= targetFrameTime) {
 
-            UpdatePlayer(&resources->player, content);
+            UpdatePlayer(&resources->player, input, content);
             frameAccumulator -= targetFrameTime;
         }
 
         Vector2 cursor = GetVirtualMousePosition();
+        input = GetInput();
 
         UpdateEditor(&resources->editor, cursor, resources->map, tilemapFile);
 

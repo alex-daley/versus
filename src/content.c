@@ -20,16 +20,16 @@ static void LoadPlayerAnimations(Content* content) {
     const int frameSpeed = 8;
 
     content->playerIdleAnimation = AllocateAnimation(frameCount, frameSpeed);
-    content->playerIdleAnimation.rectangles[0] = (Rectangle){  0.0f, 0.0f, 24.0f, 24.0f };
-    content->playerIdleAnimation.rectangles[1] = (Rectangle){ 24.0f, 0.0f, 24.0f, 24.0f };
-    content->playerIdleAnimation.rectangles[2] = (Rectangle){ 48.0f, 0.0f, 24.0f, 24.0f };
-    content->playerIdleAnimation.rectangles[3] = (Rectangle){ 72.0f, 0.0f, 24.0f, 24.0f };
+    content->playerIdleAnimation.rectangles[0] = (Rectangle){  0.0f, 0.0f, 18.0f, 24.0f };
+    content->playerIdleAnimation.rectangles[1] = (Rectangle){ 24.0f, 0.0f, 18.0f, 24.0f };
+    content->playerIdleAnimation.rectangles[2] = (Rectangle){ 48.0f, 0.0f, 18.0f, 24.0f };
+    content->playerIdleAnimation.rectangles[3] = (Rectangle){ 72.0f, 0.0f, 18.0f, 24.0f };
 
     content->playerMoveAnimation = AllocateAnimation(frameCount, frameSpeed);
-    content->playerMoveAnimation.rectangles[0] = (Rectangle){  0.0f, 24.0f, 24.0f, 24.0f };
-    content->playerMoveAnimation.rectangles[1] = (Rectangle){ 24.0f, 24.0f, 24.0f, 24.0f };
-    content->playerMoveAnimation.rectangles[2] = (Rectangle){ 48.0f, 24.0f, 24.0f, 24.0f };
-    content->playerMoveAnimation.rectangles[3] = (Rectangle){ 72.0f, 24.0f, 24.0f, 24.0f };
+    content->playerMoveAnimation.rectangles[0] = (Rectangle){  0.0f, 24.0f, 18.0f, 24.0f };
+    content->playerMoveAnimation.rectangles[1] = (Rectangle){ 24.0f, 24.0f, 18.0f, 24.0f };
+    content->playerMoveAnimation.rectangles[2] = (Rectangle){ 48.0f, 24.0f, 18.0f, 24.0f };
+    content->playerMoveAnimation.rectangles[3] = (Rectangle){ 72.0f, 24.0f, 18.0f, 24.0f };
 }
 
 static void UnloadPlayerAnimations(Content* content) {
