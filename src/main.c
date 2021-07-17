@@ -123,6 +123,7 @@ int main() {
     Resources* resources = LoadResources();
     Content* content = LoadContent();
     GameInput input = GetInput();
+    GameTime time = { .dt = targetFrameTime };
     double frameAccumulator = 0.0;
 
     while (!WindowShouldClose()) {
@@ -130,8 +131,7 @@ int main() {
         // https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
         frameAccumulator += GetSnappedFrameTime();
         while (frameAccumulator >= targetFrameTime) {
-
-            UpdatePlayer(&resources->player, input, content);
+            UpdatePlayer(&resources->player, input, time, resources->map, content);
             frameAccumulator -= targetFrameTime;
         }
 

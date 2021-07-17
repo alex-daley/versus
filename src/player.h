@@ -19,5 +19,5 @@ typedef struct Player {
     int frameCounter;
     bool flipX;
 
-    int velocity;
+    float velocity;
 } Player;

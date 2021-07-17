@@ -1,10 +1,17 @@
 #pragma once
 #include "content.h"
 #include "player.h"
+#include "tilemap.h"
 
 typedef struct GameInput {
     int horizontal;
 } GameInput;
 
+typedef struct GameTime {
+    double dt;
+} GameTime;
+
 Player LoadPlayer(int minX, int minY);
-void UpdatePlayer(Player* player, GameInput input, Content* content);
+
+// TODO: Tidy up.
+void UpdatePlayer(Player* player, GameInput input, GameTime time, Tilemap map, Content* content);
