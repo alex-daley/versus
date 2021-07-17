@@ -82,13 +82,11 @@ static void MoveX(Player* player, Tilemap map, float translationX) {
             move -= sign;
         }
         else {
-            /*
             // Snap to the tile adjacent to it.
             Vector2 snapPoint = TileToWorldPoint(map, (Point) { .x = point.x - sign, .y = point.y });
             int width = player->maxX - player->minX;
             player->minX = (int)roundf(snapPoint.x);
             player->maxX = player->minX + width;
-            */
             break;
         }
     }
