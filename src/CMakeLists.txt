@@ -58,12 +58,16 @@ if(NOT raylib_FOUND)
 endif()
 
 add_executable(versus
+    animator.c
     content.c
     drawing.c
     editor.c
     game.c
     main.c
-    tilemap_serialisation.c )
+    physics.c
+    player.c
+    tilemap.c
+    tilemap_serialisation.c)
 
 target_link_libraries(versus raylib)
 

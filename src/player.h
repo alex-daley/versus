@@ -1,6 +1,10 @@
-#pragma once
+#pragma 
+#include "animator.h"
+#include "content.h"
+#include "physics.h"
+#include "tilemap.h"
 
-static const int playerWidth  = 16;
+static const int playerWidth = 16;
 static const int playerHeight = 24;
 
 typedef enum PlayerState {
@@ -9,15 +13,11 @@ typedef enum PlayerState {
 } PlayerState;
 
 typedef struct Player {
-    int minX;
-    int minY;
-    int maxX;
-    int maxY;
-
+    Animator animator;
+    Animation* currentAnimation;
+    PhysicsObject physics;
     PlayerState state;
-    int currentFrame;
-    int frameCounter;
-    bool flipX;
-
-    float velocity;
 } Player;
+
+Player LoadPlayer();
+void UpdatePlayer(Player* player, const Content* content, Tilemap map);

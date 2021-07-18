@@ -1,13 +1,9 @@
 #pragma once
 #include <raylib.h>
-
-typedef struct Animation {
-    Rectangle* rectangles;
-    int frameCount;
-    int frameSpeed;
-} Animation;
+#include "animator.h"
 
 typedef struct Content {
+    Texture playerAtlas;
     Animation playerIdleAnimation;
     Animation playerMoveAnimation;
 } Content;

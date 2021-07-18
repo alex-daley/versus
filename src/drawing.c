@@ -27,13 +27,7 @@ static void DebugGrid(int columns, int rows, int spacing) {
     }
 }
 
-void DrawEditor(Editor editor, Tilemap map) {
-    if (editor.showGrid) {
-        DebugGrid(map.columns, map.rows, map.tileSize);
-    }
-}
-
-void DrawTilemap(Tilemap map) {
+static void DrawTilemap(Tilemap map) {
     for (int y = 0; y < map.rows; y++) {
         for (int x = 0; x < map.columns; x++) {
             if (map.tiles[x + map.columns * y] == 1) {
@@ -45,33 +39,36 @@ void DrawTilemap(Tilemap map) {
     }
 }
 
-void DrawPlayer(Player player, Texture atlas, const Content* content) {
-    Animation currentAnimation = { 0 };
-    
-    switch (player.state) {
-        case PLAYER_IDLE:
-            currentAnimation = content->playerIdleAnimation;
-            break;
-
-        case PLAYER_RUNNING:
-            currentAnimation = content->playerMoveAnimation;
-            break;
+static void DrawPlayer(Player player, const Content* content) {
+    Animation* anim = player.currentAnimation;
+    if (!anim) {
+        return;
     }
 
-    Rectangle src = currentAnimation.rectangles[player.currentFrame];
-    
-    if (player.flipX) {
+    Rectangle src = anim->rectangles[player.animator.currentFrame];
+    if (player.animator.flipX) {
         src.width = -src.width;
     }
 
     Rectangle dst = {
-        (float)player.minX,
-        (float)player.minY,
-        (float)player.maxX - player.minX,
-        (float)player.maxY - player.minY
+        (float)player.physics.minX,
+        (float)player.physics.minY,
+        (float)player.physics.maxX - player.physics.minX,
+        (float)player.physics.maxY - player.physics.minY
     };
 
     DrawRectangleLinesEx(dst, 1, RED);
+    DrawTexturePro(content->playerAtlas, src, dst, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+}
 
-    DrawTexturePro(atlas, src, dst, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+void DrawGame(Game game) {
+    DrawTilemap(game.map);
+    DrawPlayer(game.player, game.content);
+}
+
+void DrawEditor(Editor editor, Game game) {
+    if (editor.showGrid) {
+        Tilemap map = game.map;
+        DebugGrid(map.columns, map.rows, map.tileSize);
+    }
 }

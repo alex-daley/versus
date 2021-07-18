@@ -1,10 +1,6 @@
 #pragma once
-#include <raylib.h>
-#include "content.h"
-#include "tilemap.h"
 #include "editor.h"
-#include "player.h"
+#include "game.h"
 
-void DrawEditor(Editor editor, Tilemap map);
-void DrawTilemap(Tilemap map);
-void DrawPlayer(Player player, Texture atlas, const Content* content);
+void DrawGame(Game game);
+void DrawEditor(Editor editor, Game game);

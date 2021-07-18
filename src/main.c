@@ -1,34 +1,15 @@
-#include <stdlib.h>
-#include <assert.h>
+#pragma once
 #include <math.h>
 #include <raylib.h>
-
-#include "content.h"
-#include "drawing.h"
+#include "config.h"
 #include "editor.h"
 #include "game.h"
-#include "player.h"
-#include "tilemap.h"
-#include "tilemap_serialisation.h"
+#include "drawing.h"
 
-static const int logicalWidth       = 320;
-static const int logicalHeight      = 240;
-static const int defaultWidth       = 1280;
-static const int defaultHeight      = 720;
-static const unsigned int flags     = FLAG_VSYNC_HINT;
-static const int targetFPS          = 60;
-static const double targetFrameTime = 1.0 / 60.0;
-static const char* title            = "Versus";
-static const char* tilemapFile      = "Versus.world";
-static const char* playerAtlasFile  = "export/player.png";
-
-typedef struct Resources {
-    RenderTexture renderTarget;
-    Tilemap map;
-    Texture playerAtlas;
-    Player player;
-    Editor editor;
-} Resources;
+static const int defaultWidth = 1280;
+static const int defaultHeight = 720;
+static const unsigned int flags = FLAG_VSYNC_HINT;
+static const char* title = "Versus";
 
 static inline double Min(double a, double b) {
     return a < b ? a : b;
@@ -47,13 +28,13 @@ static void DrawPixelPerfect(Texture2D renderTarget) {
 
     Rectangle src = { 0.0f,  0.0f, (float)logicalWidth, (float)-logicalHeight };
     Rectangle dst = {
-        (float)((cx - ((double)logicalWidth  * scale)) / 2.0),
+        (float)((cx - ((double)logicalWidth * scale)) / 2.0),
         (float)((cy - ((double)logicalHeight * scale)) / 2.0),
-        (float)((double)logicalWidth  * scale),
+        (float)((double)logicalWidth * scale),
         (float)((double)logicalHeight * scale)
     };
 
-    DrawTexturePro(renderTarget, src, dst, 
+    DrawTexturePro(renderTarget, src, dst,
         (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
 }
 
@@ -85,77 +66,42 @@ static Vector2 GetVirtualMousePosition() {
     return mouse;
 }
 
-static GameInput GetInput() {
-    GameInput input = { 0 };
-
-    // TODO: Controller input.
-    if (IsKeyDown(KEY_D)) input.horizontal += 1;
-    if (IsKeyDown(KEY_A)) input.horizontal -= 1;
-
-    return input;
-}
-
-static Resources* LoadResources() {
-    Resources* resources = malloc(sizeof(Resources));
-    assert(resources);
-
-    resources->renderTarget = LoadRenderTexture(logicalWidth, logicalHeight);
-    resources->playerAtlas = LoadTexture(playerAtlasFile);
-    resources->player = LoadPlayer((logicalWidth / 2), (logicalHeight / 2));
-    resources->map = LoadTilemap(tilemapFile);
-    resources->editor = (Editor){ 0 };
-
-    return resources;
-}
-
-static void UnloadResources(Resources* resources) {
-    UnloadRenderTexture(resources->renderTarget);
-    UnloadTilemap(resources->map);
-    UnloadTexture(resources->playerAtlas);
-    free(resources);
-}
-
 int main() {
     SetConfigFlags(flags);
-    SetTargetFPS(targetFPS);
+    SetTargetFPS(60);
     InitWindow(defaultWidth, defaultHeight, title);
 
-    Resources* resources = LoadResources();
-    Content* content = LoadContent();
-    GameInput input = GetInput();
-    GameTime time = { .dt = targetFrameTime };
-    double frameAccumulator = 0.0;
+    RenderTexture rt = LoadRenderTexture(logicalWidth, logicalHeight);
+    Game game = LoadGame();
+    Editor editor = { 0 };
 
+    double accum = 0.0;
+    
     while (!WindowShouldClose()) {
-        
         // https://medium.com/@tglaiel/how-to-make-your-game-run-at-60fps-24c61210fe75
-        frameAccumulator += GetSnappedFrameTime();
-        while (frameAccumulator >= targetFrameTime) {
-            UpdatePlayer(&resources->player, input, time, resources->map, content);
-            frameAccumulator -= targetFrameTime;
+        accum += GetSnappedFrameTime();
+        while (accum >= fixedDeltaTime) {
+            UpdateGame(&game);
+            accum -= fixedDeltaTime;
         }
 
-        Vector2 cursor = GetVirtualMousePosition();
-        input = GetInput();
-
-        UpdateEditor(&resources->editor, cursor, resources->map, tilemapFile);
+        UpdateEditor(&editor, GetVirtualMousePosition(), game.map, mapName);
 
         BeginDrawing();
         ClearBackground(SKYBLUE);
-        BeginTextureMode(resources->renderTarget);
-        
+        BeginTextureMode(rt);
         ClearBackground(BLACK);
-        DrawTilemap(resources->map);
-        DrawPlayer(resources->player, resources->playerAtlas, content);
-        DrawEditor(resources->editor, resources->map);
+        
+        DrawGame(game);
+        DrawEditor(editor, game);
 
         EndTextureMode();
-        DrawPixelPerfect(resources->renderTarget.texture);
+        DrawPixelPerfect(rt.texture);
         EndDrawing();
     }
-
-    UnloadResources(resources);
-    UnloadContent(content);
+    
+    UnloadGame(game);
+    UnloadRenderTexture(rt);
     CloseWindow();
 
     return 0;
