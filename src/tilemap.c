@@ -22,8 +22,8 @@ void TileToWorldPoint(Tilemap map, int x, int y, float* outX, float* outY) {
     assert(y < map.rows);
     assert(y >= 0);
 
-    *outX = x * map.tileSize;
-    *outY = y * map.tileSize;
+    *outX = (float)x * map.tileSize;
+    *outY = (float)y * map.tileSize;
 
 }
 
