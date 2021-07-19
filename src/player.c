@@ -40,6 +40,7 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
     if (IsKeyDown(KEY_A)) xInput -= 1;
 
     player->physics = MoveX(player->physics, map, xInput * maxSpeed * fixedDeltaTime);
+    player->physics = MoveY(player->physics, map, 1);
 
     if (xInput != 0) {
         player->state = PLAYER_RUNNING;

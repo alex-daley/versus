@@ -67,3 +67,47 @@ PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount) {
 
     return object;
 }
+
+PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount) {
+    object.velocityY += amount;
+    int move = (int)round(amount);
+    if (move == 0) {
+        return object;
+    }
+
+    object.velocityY -= (double)move;
+    int sign = Sign(move);
+
+    while (move != 0) {
+        const int origin = sign == 1 ? object.maxY : object.minY;
+        const int target = origin + sign + 1;
+        const int width = Width(object, skin);
+
+        bool blocked = false;
+        int tileX, tileY;
+        for (int i = 0; i < width; i++) {
+            WorldToTilePoint(map, object.minX + i, target, &tileX, &tileY);
+            Tile tile = TileAt(map, tileX, tileY);
+            if (!blocked) {
+                blocked = tile != 0;
+            }
+        }
+
+        if (!blocked) {
+            object = Translate(object, 0, sign);
+            move -= sign;
+        }
+        else {
+            float x, y;
+            TileToWorldPoint(map, tileX, tileY, &x, &y);
+
+            int height = Height(object, 0);
+            object.maxY = (int)roundf(y);
+            object.minY = object.maxY - height;
+            
+            break;
+        }
+    }
+
+    return object;
+}

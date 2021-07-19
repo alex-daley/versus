@@ -11,3 +11,4 @@ typedef struct PhysicsObject {
 } PhysicsObject;
 
 PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount);
+PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount);
