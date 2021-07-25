@@ -25,6 +25,9 @@ static void UpdatePlayerAnimator(Player* player, const Content* content) {
         case PLAYER_RUNNING:
             player->currentAnimation = &content->playerMoveAnimation;
             break;
+        case PLAYER_JUMPING:
+            player->currentAnimation = &content->playerJumpAnimation;
+            break;
         default:
             player->currentAnimation = &content->playerIdleAnimation;
             break;
@@ -55,10 +58,12 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
     if (IsKeyDown(KEY_A)) xInput -= 1;
 
     player->physics = MoveX(player->physics, map, xInput * maxSpeed * fixedDeltaTime);
-    
-    
+
+
     player->velocityY += Gravity() * fixedDeltaTime;
     player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
+
+    // TODO: Tidy up
 
     if (player->physics.isGrounded) {
         player->velocityY = 0.0;
@@ -69,11 +74,19 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
         player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
     }
 
-    if (xInput != 0) {
-        player->state = PLAYER_RUNNING;
-        player->animator.flipX = xInput == -1;
+    if (player->physics.isGrounded) {
+        if (xInput != 0) {
+            player->state = PLAYER_RUNNING;
+            player->animator.flipX = xInput == -1;
+        }
+        else {
+            player->state = PLAYER_IDLE;
+        }
     }
     else {
-        player->state = PLAYER_IDLE;
+        player->state = PLAYER_JUMPING;
+        if (xInput != 0) {
+            player->animator.flipX = xInput == -1;
+        }
     }
 }

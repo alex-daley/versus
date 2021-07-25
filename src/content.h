@@ -6,6 +6,7 @@ typedef struct Content {
     Texture playerAtlas;
     Animation playerIdleAnimation;
     Animation playerMoveAnimation;
+    Animation playerJumpAnimation;
 } Content;
 
 Content* LoadContent();

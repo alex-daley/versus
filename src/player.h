@@ -9,7 +9,8 @@ static const int playerHeight = 24;
 
 typedef enum PlayerState {
     PLAYER_IDLE,
-    PLAYER_RUNNING
+    PLAYER_RUNNING,
+    PLAYER_JUMPING
 } PlayerState;
 
 typedef struct Player {
