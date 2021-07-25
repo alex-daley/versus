@@ -1,4 +1,4 @@
-#pragma 
+#pragma
 #include "animator.h"
 #include "content.h"
 #include "physics.h"
@@ -17,6 +17,8 @@ typedef struct Player {
     Animation* currentAnimation;
     PhysicsObject physics;
     PlayerState state;
+
+    float velocityY;
 } Player;
 
 Player LoadPlayer();

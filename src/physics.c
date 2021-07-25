@@ -26,13 +26,13 @@ static inline int Sign(int number) {
 }
 
 PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount) {
-    object.velocityX += amount;
-    int move = (int)round(amount);
+    object.moveRemainderX += amount;
+    int move = (int)round(object.moveRemainderX);
     if (move == 0) {
         return object;
     }
     
-    object.velocityX -= (double)move;
+    object.moveRemainderX -= (double)move;
     int sign = Sign(move);
     
     while (move != 0) {
@@ -69,13 +69,13 @@ PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount) {
 }
 
 PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount) {
-    object.velocityY += amount;
-    int move = (int)round(amount);
+    object.moveRemainderY += amount;
+    int move = (int)round(object.moveRemainderY);
     if (move == 0) {
         return object;
     }
 
-    object.velocityY -= (double)move;
+    object.moveRemainderY -= (double)move;
     int sign = Sign(move);
 
     while (move != 0) {
@@ -93,6 +93,8 @@ PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount) {
             }
         }
 
+        object.isGrounded = false;
+
         if (!blocked) {
             object = Translate(object, 0, sign);
             move -= sign;
@@ -104,7 +106,8 @@ PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount) {
             int height = Height(object, 0);
             object.maxY = (int)roundf(y);
             object.minY = object.maxY - height;
-            
+            object.isGrounded = true;
+
             break;
         }
     }

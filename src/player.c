@@ -1,8 +1,23 @@
 #include <stdlib.h>
+#include <math.h>
 #include "player.h"
 #include "config.h"
 
 static const float maxSpeed = 96.0f;
+static const double timeToApex = 0.3;
+
+static double Gravity() {
+    static const double tiles = 2;
+    
+    double height = tiles * (double)tileSize;
+    double gravity = ((height * 2.0) / (pow(timeToApex, 2.0)));
+
+    return gravity;
+}
+
+static double TakeoffVelocity() {
+    return (-(Gravity() * timeToApex));
+}
 
 static void UpdatePlayerAnimator(Player* player, const Content* content) {
 
@@ -40,7 +55,19 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
     if (IsKeyDown(KEY_A)) xInput -= 1;
 
     player->physics = MoveX(player->physics, map, xInput * maxSpeed * fixedDeltaTime);
-    player->physics = MoveY(player->physics, map, 1);
+    
+    
+    player->velocityY += Gravity() * fixedDeltaTime;
+    player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
+
+    if (player->physics.isGrounded) {
+        player->velocityY = 0.0;
+    }
+
+    if (player->physics.isGrounded && IsKeyPressed(KEY_SPACE)) {
+        player->velocityY += TakeoffVelocity();
+        player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
+    }
 
     if (xInput != 0) {
         player->state = PLAYER_RUNNING;

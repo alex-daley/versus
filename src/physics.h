@@ -1,9 +1,12 @@
 #pragma once
+#include <stdbool.h>
 #include "tilemap.h"
 
 typedef struct PhysicsObject {
-    double velocityX;
-    double velocityY;
+    double moveRemainderX;
+    double moveRemainderY;
+    bool isGrounded;
+
     int minX;
     int minY;
     int maxX;

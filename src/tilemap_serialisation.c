@@ -2,10 +2,10 @@
 #include <assert.h>
 #include <raylib.h>
 #include "tilemap_serialisation.h"
+#include "config.h"
 
 static const int columns = 20;
 static const int rows = 15;
-static const int tileSize = 16;
 
 static inline size_t GetTileCount() {
     return (size_t)columns * rows;
