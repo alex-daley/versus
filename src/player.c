@@ -36,6 +36,11 @@ static void UpdatePlayerAnimator(Player* player, const Content* content) {
     UpdateAnimator(&player->animator, *player->currentAnimation);
 }
 
+static void Jump(Player* player, Tilemap map) {
+    player->velocityY += TakeoffVelocity();
+    player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
+}
+
 Player LoadPlayer() {
     int x = logicalWidth / 2;
     int y = logicalHeight / 2;
@@ -57,36 +62,28 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
     if (IsKeyDown(KEY_D)) xInput += 1;
     if (IsKeyDown(KEY_A)) xInput -= 1;
 
-    player->physics = MoveX(player->physics, map, xInput * maxSpeed * fixedDeltaTime);
-
-
     player->velocityY += Gravity() * fixedDeltaTime;
+    player->physics = MoveX(player->physics, map, xInput * maxSpeed * fixedDeltaTime);
     player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
-
-    // TODO: Tidy up
+    
+    if (xInput != 0) {
+        player->animator.flipX = xInput == -1;
+    }
 
     if (player->physics.isGrounded) {
         player->velocityY = 0.0;
-    }
 
-    if (player->physics.isGrounded && IsKeyPressed(KEY_SPACE)) {
-        player->velocityY += TakeoffVelocity();
-        player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
-    }
-
-    if (player->physics.isGrounded) {
-        if (xInput != 0) {
-            player->state = PLAYER_RUNNING;
-            player->animator.flipX = xInput == -1;
+        if (IsKeyPressed(KEY_SPACE)) {
+            player->state = PLAYER_JUMPING;
+            Jump(player, map);
         }
         else {
-            player->state = PLAYER_IDLE;
-        }
-    }
-    else {
-        player->state = PLAYER_JUMPING;
-        if (xInput != 0) {
-            player->animator.flipX = xInput == -1;
+            if (xInput != 0) {
+                player->state = PLAYER_RUNNING;
+            }
+            else {
+                player->state = PLAYER_IDLE;
+            }
         }
     }
 }
