@@ -20,6 +20,8 @@ typedef struct Player {
     PlayerState state;
 
     float velocityY;
+    double jumpLeewayCounter;
+    double jumpBufferCounter;
 } Player;
 
 Player LoadPlayer();

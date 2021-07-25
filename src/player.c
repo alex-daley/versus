@@ -5,6 +5,9 @@
 
 static const float maxSpeed = 96.0f;
 static const double timeToApex = 0.3;
+static const double jumpLeewayTime = 0.2;
+static const double jumpBufferTime = 0.1;
+
 
 static double Gravity() {
     static const double tiles = 2;
@@ -37,8 +40,10 @@ static void UpdatePlayerAnimator(Player* player, const Content* content) {
 }
 
 static void Jump(Player* player, Tilemap map) {
-    player->velocityY += TakeoffVelocity();
+    player->physics.moveRemainderY = 0;
+    player->velocityY = TakeoffVelocity();
     player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
+    player->jumpLeewayCounter = 0;
 }
 
 Player LoadPlayer() {
@@ -72,10 +77,12 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
 
     if (player->physics.isGrounded) {
         player->velocityY = 0.0;
+        player->jumpLeewayCounter = GetTime();
 
-        if (IsKeyPressed(KEY_SPACE)) {
+        if (IsKeyPressed(KEY_SPACE) || (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
             player->state = PLAYER_JUMPING;
             Jump(player, map);
+            player->jumpBufferCounter = 0;
         }
         else {
             if (xInput != 0) {
@@ -85,5 +92,11 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
                 player->state = PLAYER_IDLE;
             }
         }
+    }
+    else if (IsKeyPressed(KEY_SPACE) && ((GetTime() - player->jumpLeewayCounter) < jumpLeewayTime)) {
+        Jump(player, map);
+    } 
+    else if (IsKeyPressed(KEY_SPACE)) {
+        player->jumpBufferCounter = GetTime();
     }
 }
