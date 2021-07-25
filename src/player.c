@@ -22,13 +22,13 @@ static double TakeoffVelocity() {
     return (-(Gravity() * timeToApex));
 }
 
-static void UpdatePlayerAnimator(Player* player, const Content* content) {
+static void UpdatePlayerAnimator(Player* player, Content* content) {
 
     switch (player->state) {
-        case PLAYER_RUNNING:
+        case PLAYER_RUN:
             player->currentAnimation = &content->playerMoveAnimation;
             break;
-        case PLAYER_JUMPING:
+        case PLAYER_JUMP:
             player->currentAnimation = &content->playerJumpAnimation;
             break;
         default:
@@ -44,7 +44,7 @@ static void Jump(Player* player, Tilemap map) {
     player->jumpLeewayCounter = 0.0;
     player->jumpBufferCounter = 0.0;
     
-    player->state = PLAYER_JUMPING;
+    player->state = PLAYER_JUMP;
     player->velocityY = TakeoffVelocity();
     player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
 }
@@ -88,7 +88,7 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
         }
         else {
             if (xInput != 0) {
-                player->state = PLAYER_RUNNING;
+                player->state = PLAYER_RUN;
             }
             else {
                 player->state = PLAYER_IDLE;
