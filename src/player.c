@@ -40,10 +40,13 @@ static void UpdatePlayerAnimator(Player* player, const Content* content) {
 }
 
 static void Jump(Player* player, Tilemap map) {
-    player->physics.moveRemainderY = 0;
+    player->physics.moveRemainderY = 0.0;
+    player->jumpLeewayCounter = 0.0;
+    player->jumpBufferCounter = 0.0;
+    
+    player->state = PLAYER_JUMPING;
     player->velocityY = TakeoffVelocity();
     player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
-    player->jumpLeewayCounter = 0;
 }
 
 Player LoadPlayer() {
@@ -80,7 +83,6 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
         player->jumpLeewayCounter = GetTime();
 
         if (IsKeyPressed(KEY_SPACE) || (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
-            player->state = PLAYER_JUMPING;
             Jump(player, map);
             player->jumpBufferCounter = 0;
         }
