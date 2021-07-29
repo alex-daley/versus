@@ -1,6 +1,8 @@
+#include <raylib.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include "config.h"
 #include "physics.h"
 
 static const int skin = 1;
@@ -31,7 +33,7 @@ PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount) {
     if (move == 0) {
         return object;
     }
-    
+
     object.moveRemainderX -= (double)move;
     int sign = Sign(move);
     
@@ -67,6 +69,7 @@ PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount) {
 
     return object;
 }
+
 
 PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount) {
     object.moveRemainderY += amount;

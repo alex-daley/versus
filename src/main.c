@@ -28,10 +28,10 @@ static void DrawPixelPerfect(Texture2D renderTarget) {
 
     Rectangle src = { 0.0f,  0.0f, (float)logicalWidth, (float)-logicalHeight };
     Rectangle dst = {
-        (float)((cx - ((double)logicalWidth * scale)) / 2.0),
-        (float)((cy - ((double)logicalHeight * scale)) / 2.0),
-        (float)((double)logicalWidth * scale),
-        (float)((double)logicalHeight * scale)
+        (float)round(((cx - ((double)logicalWidth * scale)) / 2.0)),
+        (float)round(((cy - ((double)logicalHeight * scale)) / 2.0)),
+        (float)round(((double)logicalWidth * scale)),
+        (float)round(((double)logicalHeight * scale))
     };
 
     DrawTexturePro(renderTarget, src, dst,

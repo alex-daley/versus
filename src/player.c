@@ -3,24 +3,11 @@
 #include "player.h"
 #include "config.h"
 
-static const float maxSpeed = 96.0f;
-static const double timeToApex = 0.3;
+static const double moveSpeed = 2;
+static const double gravity = 0.2;
+static const double jumpSpeed = -4;
 static const double jumpLeewayTime = 0.2;
 static const double jumpBufferTime = 0.1;
-
-
-static double Gravity() {
-    static const double tiles = 2;
-    
-    double height = tiles * (double)tileSize;
-    double gravity = ((height * 2.0) / (pow(timeToApex, 2.0)));
-
-    return gravity;
-}
-
-static double TakeoffVelocity() {
-    return (-(Gravity() * timeToApex));
-}
 
 static void UpdatePlayerAnimator(Player* player, Content* content) {
 
@@ -45,8 +32,7 @@ static void Jump(Player* player, Tilemap map) {
     player->jumpBufferCounter = 0.0;
     
     player->state = PLAYER_JUMP;
-    player->velocityY = TakeoffVelocity();
-    player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
+    player->velocityY = jumpSpeed;
 }
 
 Player LoadPlayer() {
@@ -70,10 +56,10 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
     if (IsKeyDown(KEY_D)) xInput += 1;
     if (IsKeyDown(KEY_A)) xInput -= 1;
 
-    player->velocityY += Gravity() * fixedDeltaTime;
-    player->physics = MoveX(player->physics, map, xInput * maxSpeed * fixedDeltaTime);
-    player->physics = MoveY(player->physics, map, player->velocityY * fixedDeltaTime);
-    
+    player->velocityY += gravity;
+    player->physics = MoveX(player->physics, map, xInput * moveSpeed);    
+    player->physics = MoveY(player->physics, map, player->velocityY);
+
     if (xInput != 0) {
         player->animator.flipX = xInput == -1;
     }
