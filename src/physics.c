@@ -83,7 +83,7 @@ PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount) {
 
     while (move != 0) {
         const int origin = sign == 1 ? object.maxY : object.minY;
-        const int target = origin + sign + 1;
+        const int target = origin + sign;
         const int width = Width(object, skin);
 
         bool blocked = false;
@@ -96,20 +96,27 @@ PhysicsObject MoveY(PhysicsObject object, Tilemap map, double amount) {
             }
         }
 
-        object.isGrounded = false;
-
         if (!blocked) {
+            object.contacts &= ~(CONTACT_ABOVE | CONTACT_BELOW);
             object = Translate(object, 0, sign);
             move -= sign;
         }
         else {
             float x, y;
-            TileToWorldPoint(map, tileX, tileY, &x, &y);
+            TileToWorldPoint(map, tileX, tileY - sign, &x, &y);
 
             int height = Height(object, 0);
-            object.maxY = (int)roundf(y);
-            object.minY = object.maxY - height;
-            object.isGrounded = true;
+
+            if (sign > 0) {
+                object.contacts |= CONTACT_BELOW;
+                object.minY = (int)roundf(y) - (height - tileSize);
+                object.maxY = object.minY + height ;
+            }
+            else {
+                object.contacts |= CONTACT_ABOVE;
+                object.minY = (int)roundf(y);
+                object.maxY = object.minY + height;
+            }
 
             break;
         }

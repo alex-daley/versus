@@ -26,6 +26,14 @@ static void UpdatePlayerAnimator(Player* player, Content* content) {
     UpdateAnimator(&player->animator, *player->currentAnimation);
 }
 
+static bool IsGrounded(const Player* player) {
+    return ((player->physics.contacts & CONTACT_BELOW) != 0);
+}
+
+static bool IsTouchingCeiling(const Player* player) {
+    return ((player->physics.contacts & CONTACT_ABOVE) != 0);
+}
+
 static void Jump(Player* player, Tilemap map) {
     player->physics.moveRemainderY = 0.0;
     player->jumpLeewayCounter = 0.0;
@@ -60,11 +68,15 @@ void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
     player->physics = MoveX(player->physics, map, xInput * moveSpeed);    
     player->physics = MoveY(player->physics, map, player->velocityY);
 
+    if (IsTouchingCeiling(player)) {
+        player->velocityY = 0.0;
+    }
+
     if (xInput != 0) {
         player->animator.flipX = xInput == -1;
     }
 
-    if (player->physics.isGrounded) {
+    if (IsGrounded(player)) {
         player->velocityY = 0.0;
         player->jumpLeewayCounter = GetTime();
 
