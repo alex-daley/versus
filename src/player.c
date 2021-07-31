@@ -57,7 +57,7 @@ Player LoadPlayer() {
     return player;
 }
 
-void UpdatePlayer(Player* player, const Content* content, Tilemap map) {
+void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     UpdatePlayerAnimator(player, content);
 
     int xInput = 0;

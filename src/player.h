@@ -25,4 +25,4 @@ typedef struct Player {
 } Player;
 
 Player LoadPlayer();
-void UpdatePlayer(Player* player, const Content* content, Tilemap map);
+void UpdatePlayer(Player* player, Content* content, Tilemap map);
