@@ -1,4 +1,7 @@
 #include <raylib.h>
+
+
+
 #include "drawing.h"
 
 static const Color gridColour = { 80, 80, 80, 255 };
@@ -25,6 +28,31 @@ static void DebugGrid(int columns, int rows, int spacing) {
         Vector2 p2 = { p1.x, height };
         DrawLineEx(p1, p2, gridThickness, gridColour);
     }
+}
+
+static const char* PlayerStateToString(PlayerState state) {
+    switch (state) {
+        case PLAYER_RUN: return "RUN";
+        case PLAYER_JUMP: return "JUMP";
+        default: return "IDLE";
+    }
+}
+
+static void DebugPlayerInfo(Player player) {
+    Contact contacts = player.physics.contacts;
+    const char* text = TextFormat(
+        "Position: (%i, %i)\n State: %s\nContacts: \n%s%s%s%s", 
+        player.physics.minX, 
+        player.physics.minY,
+        PlayerStateToString(player.state),
+        ((contacts & CONTACT_BELOW) != 0) ? "- BELOW\n" : "",
+        ((contacts & CONTACT_ABOVE) != 0) ? "- ABOVE\n" : "",
+        ((contacts & CONTACT_LEFT ) != 0) ? "- LEFT \n" : "",
+        ((contacts & CONTACT_RIGHT) != 0) ? "- RIGHT\n" : ""
+    );
+
+    DrawText(text, 8, 8, 16, WHITE);
+    
 }
 
 static void DrawTilemap(Tilemap map) {
@@ -71,4 +99,8 @@ void DrawEditor(Editor editor, Game game) {
         Tilemap map = game.map;
         DebugGrid(map.columns, map.rows, map.tileSize);
     }
+}
+
+void DrawDebugText(Game game) {
+    DebugPlayerInfo(game.player);
 }

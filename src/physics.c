@@ -53,6 +53,7 @@ PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount) {
         }
 
         if (!blocked) {
+            object.contacts &= ~(CONTACT_LEFT | CONTACT_RIGHT);
             object = Translate(object, sign, 0);
             move -= sign;
         }
@@ -63,6 +64,14 @@ PhysicsObject MoveX(PhysicsObject object, Tilemap map, double amount) {
             int width = Width(object, 0);
             object.minX = (int)roundf(x);
             object.maxX = object.minX + width;
+
+            if (sign < 0) {
+                object.contacts |= CONTACT_LEFT;
+            }
+            else {
+                object.contacts |= CONTACT_RIGHT;
+            }
+
             break;
         }
     }

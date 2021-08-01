@@ -89,6 +89,7 @@ int main() {
 
         BeginDrawing();
         ClearBackground(SKYBLUE);
+        DrawDebugText(game);
         BeginTextureMode(rt);
         ClearBackground(BLACK);
         

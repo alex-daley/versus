@@ -4,3 +4,4 @@
 
 void DrawGame(Game game);
 void DrawEditor(Editor editor, Game game);
+void DrawDebugText(Game game);
