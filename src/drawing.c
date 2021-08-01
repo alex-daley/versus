@@ -34,6 +34,7 @@ static const char* PlayerStateToString(PlayerState state) {
     switch (state) {
         case PLAYER_RUN: return "RUN";
         case PLAYER_JUMP: return "JUMP";
+        case PLAYER_JUMPWALL: return "WALL JUMP";
         default: return "IDLE";
     }
 }

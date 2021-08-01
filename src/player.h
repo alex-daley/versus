@@ -10,7 +10,9 @@ static const int playerHeight = 24;
 typedef enum PlayerState {
     PLAYER_IDLE,
     PLAYER_RUN,
-    PLAYER_JUMP
+    PLAYER_FALL,
+    PLAYER_JUMP,
+    PLAYER_JUMPWALL
 } PlayerState;
 
 typedef struct Player {
@@ -19,6 +21,7 @@ typedef struct Player {
     PhysicsObject physics;
     PlayerState state;
 
+    double velocityX;
     double velocityY;
     double jumpLeewayCounter;
     double jumpBufferCounter;
