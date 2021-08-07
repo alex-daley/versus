@@ -2,6 +2,7 @@
 #include <math.h>
 #include "player.h"
 #include "config.h"
+#include "game_input.h"
 
 static const double moveSpeed = 2;
 static const double gravity = 0.2;
@@ -60,29 +61,25 @@ Player LoadPlayer() {
 void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     UpdatePlayerAnimator(player, content);
 
-    // TODO: REFACTOR!
-
-    int xInput = 0;
-    if (IsKeyDown(KEY_D)) xInput += 1;
-    if (IsKeyDown(KEY_A)) xInput -= 1;
-
+    // TODO: Pass as argument
+    InputState input = GetInput();
 
     if (player->state != PLAYER_JUMPWALL || player->velocityY > 0.0) {
 
         if (IsGrounded(player)) {
-            player->velocityX += xInput * moveSpeed;
-            if (xInput == 0) {
+            player->velocityX += input.x * moveSpeed;
+            if (input.x == 0) {
                 player->velocityX = 0.0;
             }
 
         }
         else {
-            player->velocityX += xInput * moveSpeed * 0.2;
+            player->velocityX += input.x * moveSpeed * 0.2;
         }
 
         if (abs(player->velocityX) >= moveSpeed) {
-            if (xInput != 0) {
-                player->velocityX = moveSpeed * xInput;
+            if (input.x != 0) {
+                player->velocityX = moveSpeed * input.x;
             }
         }
     }
@@ -104,12 +101,13 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         player->velocityY = 0.0;
         player->jumpLeewayCounter = GetTime();
 
-        if (IsKeyPressed(KEY_SPACE) || (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
+        //if (IsKeyPressed(KEY_SPACE) || (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
+        if (input.jump == JUMP_BUTTON_PRESSED || (input.jump == JUMP_BUTTON_DOWN && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
             Jump(player, map);
             player->jumpBufferCounter = 0;
         }
         else {
-            if (xInput != 0) {
+            if (input.x != 0) {
                 player->state = PLAYER_RUN;
             }
             else {
@@ -118,7 +116,8 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         }
     }
     else {
-        if (IsKeyPressed(KEY_SPACE)) {
+        //if (IsKeyPressed(KEY_SPACE)) {
+        if (input.jump == JUMP_BUTTON_PRESSED) {
             if ((player->physics.contacts & (CONTACT_RIGHT))) {
                 player->velocityX = -moveSpeed;
                 Jump(player, map);
@@ -136,7 +135,8 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
                 player->jumpBufferCounter = GetTime();
             }
         }
-        else if (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime) {
+        //else if (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime) {
+        else if (input.jump == JUMP_BUTTON_DOWN && (GetTime() - player->jumpBufferCounter) < jumpBufferTime) {
             if ((player->physics.contacts & (CONTACT_RIGHT))) {
                 player->velocityX = -moveSpeed;
                 Jump(player, map);
@@ -149,7 +149,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             }
         }
         
-        if (IsKeyReleased(KEY_SPACE) && player->state == PLAYER_JUMP) {
+        if (input.jump == JUMP_BUTTON_RELEASED && player->state == PLAYER_JUMP) {
             player->velocityY *= 0.5;
         }
     }

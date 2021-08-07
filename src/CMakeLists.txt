@@ -62,6 +62,7 @@ add_executable(versus
     drawing.c
     editor.c
     game.c
+    game_input.c
     main.c
     physics.c
     player.c
