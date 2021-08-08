@@ -16,6 +16,8 @@ typedef enum PlayerState {
 } PlayerState;
 
 typedef struct Player {
+    int index;
+
     Animator animator;
     Animation* currentAnimation;
     PhysicsObject physics;

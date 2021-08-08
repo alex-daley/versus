@@ -62,7 +62,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     UpdatePlayerAnimator(player, content);
 
     // TODO: Pass as argument
-    InputState input = GetInput();
+    InputState input = GetInput(player->index);
 
     if (player->state != PLAYER_JUMPWALL || player->velocityY > 0.0) {
 

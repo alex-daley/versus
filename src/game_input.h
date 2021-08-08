@@ -12,4 +12,4 @@ typedef struct InputState {
     int x;
 } InputState;
 
-InputState GetInput();
+InputState GetInput(int playerIndex);
