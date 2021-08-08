@@ -6,6 +6,7 @@
 
 static const double moveSpeed = 2;
 static const double gravity = 0.2;
+static const double terminalVelocity = 4;
 static const double jumpSpeed = -4;
 static const double jumpLeewayTime = 0.2;
 static const double jumpBufferTime = 0.1;
@@ -77,7 +78,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             player->velocityX += input.x * moveSpeed * 0.2;
         }
 
-        if (abs(player->velocityX) >= moveSpeed) {
+        if (fabs(player->velocityX) >= moveSpeed) {
             if (input.x != 0) {
                 player->velocityX = moveSpeed * input.x;
             }
@@ -86,6 +87,10 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
 
     
     player->velocityY += gravity;
+    if (player->velocityY > terminalVelocity) {
+        player->velocityY = terminalVelocity;
+    }
+
     player->physics = MoveX(player->physics, map, player->velocityX);
     player->physics = MoveY(player->physics, map, player->velocityY);
 
@@ -101,7 +106,6 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         player->velocityY = 0.0;
         player->jumpLeewayCounter = GetTime();
 
-        //if (IsKeyPressed(KEY_SPACE) || (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
         if (input.jump == JUMP_BUTTON_PRESSED || (input.jump == JUMP_BUTTON_DOWN && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
             Jump(player, map);
             player->jumpBufferCounter = 0;
@@ -116,7 +120,6 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         }
     }
     else {
-        //if (IsKeyPressed(KEY_SPACE)) {
         if (input.jump == JUMP_BUTTON_PRESSED) {
             if ((player->physics.contacts & (CONTACT_RIGHT))) {
                 player->velocityX = -moveSpeed;
@@ -135,7 +138,6 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
                 player->jumpBufferCounter = GetTime();
             }
         }
-        //else if (IsKeyDown(KEY_SPACE) && (GetTime() - player->jumpBufferCounter) < jumpBufferTime) {
         else if (input.jump == JUMP_BUTTON_DOWN && (GetTime() - player->jumpBufferCounter) < jumpBufferTime) {
             if ((player->physics.contacts & (CONTACT_RIGHT))) {
                 player->velocityX = -moveSpeed;
