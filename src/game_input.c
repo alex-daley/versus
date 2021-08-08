@@ -35,11 +35,38 @@ static InputState AddGamepadInput(InputState input, int index) {
     return input;
 }
 
+static InputState AddKeyboardInput(InputState input) {
+    
+    int x = 0;
+    if (IsKeyDown(KEY_A)) x -= 1;
+    if (IsKeyDown(KEY_D)) x += 1;
+    input.x = x;
+
+    if (IsKeyPressed(KEY_SPACE)) {
+        input.jump = JUMP_BUTTON_PRESSED;
+    }
+    else if (IsKeyDown(KEY_SPACE)) {
+        input.jump = JUMP_BUTTON_DOWN;
+    }
+    else if (IsKeyReleased(KEY_SPACE)) {
+        input.jump = JUMP_BUTTON_RELEASED;
+    }
+    else {
+        input.jump = JUMP_BUTTON_UP;
+    }
+
+    return input;
+}
+
 InputState GetInput() {
     const int controllerIndex = 0;
 
     InputState input = { 0 };
     input = AddGamepadInput(input, controllerIndex);
-    
+
+    if (input.x == 0 && input.jump == JUMP_BUTTON_UP) {
+        input = AddKeyboardInput(input);
+    }
+
     return input;
 }
