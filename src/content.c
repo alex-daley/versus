@@ -32,18 +32,18 @@ static void LoadPlayerAnimations(Content* content) {
     content->playerMoveAnimation.rectangles[2] = (Rectangle){ 48.0f, 24.0f, 18.0f, 24.0f };
     content->playerMoveAnimation.rectangles[3] = (Rectangle){ 72.0f, 24.0f, 18.0f, 24.0f };
 
-    content->playerJumpAnimation = AllocateAnimation(frameCount, frameSpeed);
+    content->playerJumpAnimation = AllocateAnimation(1, 1);
     content->playerJumpAnimation.rectangles[0] = (Rectangle){ 0.0f, 48.0f, 18.0f, 24.0f };
-    content->playerJumpAnimation.rectangles[1] = (Rectangle){ 24.0f, 48.0f, 18.0f, 24.0f };
-    content->playerJumpAnimation.rectangles[2] = (Rectangle){ 48.0f, 48.0f, 18.0f, 24.0f };
-    content->playerJumpAnimation.rectangles[3] = (Rectangle){ 72.0f, 48.0f, 18.0f, 24.0f };
 
+    content->playerFallAnimation = AllocateAnimation(1, 1);
+    content->playerFallAnimation.rectangles[0] = (Rectangle){ 24.0f, 48.0f, 18.0f, 24.0f };
 }
 
 static void UnloadPlayerAnimations(Content* content) {
     FreeAnimation(content->playerIdleAnimation);
     FreeAnimation(content->playerMoveAnimation);
     FreeAnimation(content->playerJumpAnimation);
+    FreeAnimation(content->playerFallAnimation);
 }
 
 Content* LoadContent() {

@@ -7,6 +7,8 @@ typedef struct Content {
     Animation playerIdleAnimation;
     Animation playerMoveAnimation;
     Animation playerJumpAnimation;
+    Animation playerFallAnimation;
+    Animation playerWallAnimation;
 } Content;
 
 Content* LoadContent();

@@ -12,7 +12,6 @@ static const double jumpLeewayTime = 0.2;
 static const double jumpBufferTime = 0.1;
 
 static void UpdatePlayerAnimator(Player* player, Content* content) {
-
     switch (player->state) {
         case PLAYER_RUN:
             player->currentAnimation = &content->playerMoveAnimation;
@@ -20,12 +19,23 @@ static void UpdatePlayerAnimator(Player* player, Content* content) {
         case PLAYER_JUMP:
             player->currentAnimation = &content->playerJumpAnimation;
             break;
+        case PLAYER_FALL:
+            player->currentAnimation = &content->playerFallAnimation;
+            break;
         default:
             player->currentAnimation = &content->playerIdleAnimation;
             break;
     }
 
     UpdateAnimator(&player->animator, *player->currentAnimation);
+}
+
+static void SetState(Player* player, PlayerState state) {
+    if (player->state != state) {
+        player->animator.currentFrame = 0;
+    }
+    
+    player->state = state;
 }
 
 static bool IsGrounded(const Player* player) {
@@ -41,7 +51,7 @@ static void Jump(Player* player, Tilemap map) {
     player->jumpLeewayCounter = 0.0;
     player->jumpBufferCounter = 0.0;
 
-    player->state = PLAYER_JUMP;
+    SetState(player, PLAYER_JUMP);
     player->velocityY = jumpSpeed;
 }
 
@@ -84,7 +94,6 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             }
         }
     }
-
     
     player->velocityY += gravity;
     if (player->velocityY > terminalVelocity) {
@@ -93,6 +102,9 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
 
     player->physics = MoveX(player->physics, map, player->velocityX);
     player->physics = MoveY(player->physics, map, player->velocityY);
+    if (!IsGrounded(player) && player->velocityY > 0) {
+        SetState(player, PLAYER_FALL);
+    }
 
     if (IsTouchingCeiling(player)) {
         player->velocityY = 0.0;
@@ -112,10 +124,10 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         }
         else {
             if (input.x != 0) {
-                player->state = PLAYER_RUN;
+                SetState(player, PLAYER_RUN);
             }
             else {
-                player->state = PLAYER_IDLE;
+                SetState(player, PLAYER_IDLE);
             }
         }
     }
@@ -124,12 +136,12 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             if ((player->physics.contacts & (CONTACT_RIGHT))) {
                 player->velocityX = -moveSpeed;
                 Jump(player, map);
-                player->state = PLAYER_JUMPWALL;
+                SetState(player, PLAYER_JUMPWALL);
             }
             else if ((player->physics.contacts & (CONTACT_LEFT))) {
                 player->velocityX = moveSpeed;
                 Jump(player, map);
-                player->state = PLAYER_JUMPWALL;
+                SetState(player, PLAYER_JUMPWALL);
             }
             else if (((GetTime() - player->jumpLeewayCounter) < jumpLeewayTime)) {
                 Jump(player, map);
@@ -142,12 +154,12 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             if ((player->physics.contacts & (CONTACT_RIGHT))) {
                 player->velocityX = -moveSpeed;
                 Jump(player, map);
-                player->state = PLAYER_JUMPWALL;
+                SetState(player, PLAYER_JUMPWALL);
             }
             else if ((player->physics.contacts & (CONTACT_LEFT))) {
                 player->velocityX = moveSpeed;
                 Jump(player, map);
-                player->state = PLAYER_JUMPWALL;
+                SetState(player, PLAYER_JUMPWALL);
             }
         }
         
