@@ -6,52 +6,91 @@
 
 static const double moveSpeed = 2;
 static const double gravity = 0.2;
+static const double halfGravityJumpVelocity = 0.2;
 static const double terminalVelocity = 4;
 static const double jumpSpeed = -4;
-static const double jumpLeewayTime = 0.2;
-static const double jumpBufferTime = 0.1;
+static const double jumpLeewayTime = 0.15;
+static const double jumpBufferTime = 0.05;
+
+static int Sign(double velocity) {
+    return velocity < 0.0 ? -1 : 1;
+}
+
+static Animation* DeduceAnimation(const Player* player, Content* content) {
+    switch (player->state) {
+        case PLAYER_RUN : return &content->playerMoveAnimation;
+        case PLAYER_JUMP: return &content->playerJumpAnimation;
+        case PLAYER_FALL: return &content->playerFallAnimation;
+        default:          return &content->playerIdleAnimation;
+    }
+}
 
 static void UpdatePlayerAnimator(Player* player, Content* content) {
-    switch (player->state) {
-        case PLAYER_RUN:
-            player->currentAnimation = &content->playerMoveAnimation;
-            break;
-        case PLAYER_JUMP:
-            player->currentAnimation = &content->playerJumpAnimation;
-            break;
-        case PLAYER_FALL:
-            player->currentAnimation = &content->playerFallAnimation;
-            break;
-        default:
-            player->currentAnimation = &content->playerIdleAnimation;
-            break;
-    }
-
+    player->currentAnimation = DeduceAnimation(player, content);
     UpdateAnimator(&player->animator, *player->currentAnimation);
 }
 
-static void SetState(Player* player, PlayerState state) {
-    if (player->state != state) {
+static void SetState(Player* player, PlayerState nextState) {
+    if (player->state != nextState) {
+        player->state = nextState;
         player->animator.currentFrame = 0;
     }
-    
-    player->state = state;
+}
+
+static void ApplyGraivty(Player* player, InputState input) {
+    // Apply half gravity if we're near the apex of a jump and still holding down the jump button :)
+    if (input.jump == JUMP_BUTTON_DOWN && (fabs(player->velocityY) < halfGravityJumpVelocity)) {
+        player->velocityY += gravity * 0.5;
+    }
+    else {
+        player->velocityY += gravity;
+    }
+
+    if (player->velocityY > terminalVelocity) {
+        player->velocityY = terminalVelocity;
+    }
+}
+
+static bool HasFlag(const Player* player, Contact flag) {
+    return ((player->physics.contacts & flag) != 0);
 }
 
 static bool IsGrounded(const Player* player) {
-    return ((player->physics.contacts & CONTACT_BELOW) != 0);
+    return HasFlag(player, CONTACT_BELOW);
 }
 
 static bool IsTouchingCeiling(const Player* player) {
-    return ((player->physics.contacts & CONTACT_ABOVE) != 0);
+    return HasFlag(player, CONTACT_ABOVE);
 }
 
-static void Jump(Player* player, Tilemap map) {
+static bool IsTouchingWall(const Player* player) {
+    return HasFlag(player, CONTACT_LEFT) || HasFlag(player, CONTACT_RIGHT);
+}
+
+static void ZeroVelocityX(Player* player) {
+    player->velocityX = 0.0;
+    player->physics.moveRemainderX = 0.0;
+}
+
+static void ZeroVelocityY(Player* player) {
+    player->velocityY = 0.0;
     player->physics.moveRemainderY = 0.0;
+}
+
+static bool HasJumpInput(InputState input, double bufferCounter) {
+    if (input.jump == JUMP_BUTTON_PRESSED) {
+        return true;
+    }
+    
+    bool withinBufferTime = (GetTime() - bufferCounter) < jumpBufferTime;
+    return input.jump == JUMP_BUTTON_DOWN && withinBufferTime;
+}
+
+static void Jump(Player* player) {
+    SetState(player, PLAYER_JUMP);
+    ZeroVelocityY(player);
     player->jumpLeewayCounter = 0.0;
     player->jumpBufferCounter = 0.0;
-
-    SetState(player, PLAYER_JUMP);
     player->velocityY = jumpSpeed;
 }
 
@@ -60,7 +99,6 @@ Player LoadPlayer() {
     int y = logicalHeight / 2;
 
     Player player = { 0 };
-
     player.physics.minX = x;
     player.physics.minY = y;
     player.physics.maxX = x + playerWidth;
@@ -70,101 +108,51 @@ Player LoadPlayer() {
 }
 
 void UpdatePlayer(Player* player, Content* content, Tilemap map) {
+    const InputState input = GetInput(player->index);
     UpdatePlayerAnimator(player, content);
 
-    // TODO: Pass as argument
-    InputState input = GetInput(player->index);
-
-    if (player->state != PLAYER_JUMPWALL || player->velocityY > 0.0) {
-
-        if (IsGrounded(player)) {
-            player->velocityX += input.x * moveSpeed;
-            if (input.x == 0) {
-                player->velocityX = 0.0;
-            }
-
-        }
-        else {
-            player->velocityX += input.x * moveSpeed * 0.2;
-        }
-
-        if (fabs(player->velocityX) >= moveSpeed) {
-            if (input.x != 0) {
-                player->velocityX = moveSpeed * input.x;
-            }
-        }
-    }
-    
-    player->velocityY += gravity;
-    if (player->velocityY > terminalVelocity) {
-        player->velocityY = terminalVelocity;
-    }
+    player->velocityX = moveSpeed * input.x;
+    ApplyGraivty(player, input);
 
     player->physics = MoveX(player->physics, map, player->velocityX);
     player->physics = MoveY(player->physics, map, player->velocityY);
-    if (!IsGrounded(player) && player->velocityY > 0) {
-        SetState(player, PLAYER_FALL);
-    }
 
-    if (IsTouchingCeiling(player)) {
-        player->velocityY = 0.0;
-    }
-
-    if (player->velocityX != 0) {
-        player->animator.flipX = player->velocityX < 0;
+    if (input.x != 0) {
+        player->animator.flipX = input.x == -1;
     }
 
     if (IsGrounded(player)) {
-        player->velocityY = 0.0;
         player->jumpLeewayCounter = GetTime();
+        player->velocityY = 0.0;
 
-        if (input.jump == JUMP_BUTTON_PRESSED || (input.jump == JUMP_BUTTON_DOWN && (GetTime() - player->jumpBufferCounter) < jumpBufferTime)) {
-            Jump(player, map);
-            player->jumpBufferCounter = 0;
+        if (input.x == 0) {
+            SetState(player, PLAYER_IDLE);
         }
         else {
-            if (input.x != 0) {
-                SetState(player, PLAYER_RUN);
-            }
-            else {
-                SetState(player, PLAYER_IDLE);
-            }
+            SetState(player, PLAYER_RUN);
+        }
+
+        if (HasJumpInput(input, player->jumpBufferCounter)) {
+            Jump(player);
         }
     }
-    else {
+    else { // !Grounded
+        if (player->velocityY > 0.0) {
+            SetState(player, PLAYER_FALL);
+        }
+
+        if (IsTouchingCeiling(player)) {
+            player->velocityY = 0.0;
+        }
+
         if (input.jump == JUMP_BUTTON_PRESSED) {
-            if ((player->physics.contacts & (CONTACT_RIGHT))) {
-                player->velocityX = -moveSpeed;
-                Jump(player, map);
-                SetState(player, PLAYER_JUMPWALL);
-            }
-            else if ((player->physics.contacts & (CONTACT_LEFT))) {
-                player->velocityX = moveSpeed;
-                Jump(player, map);
-                SetState(player, PLAYER_JUMPWALL);
-            }
-            else if (((GetTime() - player->jumpLeewayCounter) < jumpLeewayTime)) {
-                Jump(player, map);
-            }
-            else {
-                player->jumpBufferCounter = GetTime();
+            player->jumpBufferCounter = GetTime();
+            if (GetTime() - player->jumpLeewayCounter < jumpLeewayTime) {
+                Jump(player); // "Coyote Time"
             }
         }
-        else if (input.jump == JUMP_BUTTON_DOWN && (GetTime() - player->jumpBufferCounter) < jumpBufferTime) {
-            if ((player->physics.contacts & (CONTACT_RIGHT))) {
-                player->velocityX = -moveSpeed;
-                Jump(player, map);
-                SetState(player, PLAYER_JUMPWALL);
-            }
-            else if ((player->physics.contacts & (CONTACT_LEFT))) {
-                player->velocityX = moveSpeed;
-                Jump(player, map);
-                SetState(player, PLAYER_JUMPWALL);
-            }
-        }
-        
-        if (input.jump == JUMP_BUTTON_RELEASED && player->state == PLAYER_JUMP) {
-            player->velocityY *= 0.5;
+        else if (input.jump == JUMP_BUTTON_RELEASED) {
+            player->velocityY *= 0.5f;
         }
     }
 }

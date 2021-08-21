@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 #include "animator.h"
 #include "content.h"
 #include "physics.h"
@@ -6,6 +6,13 @@
 
 static const int playerWidth = 16;
 static const int playerHeight = 24;
+
+typedef enum PlayerIndex {
+    PLAYER_1,
+    PLAYER_2,
+    PLAYER_3,
+    PLAYER_4
+} PlayerIndex;
 
 typedef enum PlayerState {
     PLAYER_IDLE,
@@ -16,7 +23,7 @@ typedef enum PlayerState {
 } PlayerState;
 
 typedef struct Player {
-    int index;
+    PlayerIndex index;
 
     Animator animator;
     Animation* currentAnimation;
