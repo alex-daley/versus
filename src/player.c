@@ -79,12 +79,12 @@ static void ZeroVelocityY(Player* player) {
     player->physics.moveRemainderY = 0.0;
 }
 
-static bool HasJumpInput(InputState input, double bufferCounter) {
+static bool HasJumpInput(InputState input, double time, double bufferCounter) {
     if (input.jump == JUMP_BUTTON_PRESSED) {
         return true;
     }
     
-    bool withinBufferTime = (GetTime() - bufferCounter) < jumpBufferTime;
+    bool withinBufferTime = (time - bufferCounter) < jumpBufferTime;
     return input.jump == JUMP_BUTTON_DOWN && withinBufferTime;
 }
 
@@ -111,6 +111,8 @@ Player LoadPlayer() {
 
 void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     const InputState input = GetInput(player->index);
+    const double time = GetTime();
+
     UpdatePlayerAnimator(player, content);
 
     ApplyGraivty(player, input);
@@ -136,7 +138,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     player->physics = MoveY(player->physics, map, player->velocityY);
 
     if (IsGrounded(player)) {
-        player->jumpLeewayCounter = GetTime();
+        player->jumpLeewayCounter = time;
         player->velocityY = 0.0;
 
         if (input.x == 0) {
@@ -146,7 +148,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             SetState(player, PLAYER_RUN);
         }
 
-        if (HasJumpInput(input, player->jumpBufferCounter)) {
+        if (HasJumpInput(input, time, player->jumpBufferCounter)) {
             Jump(player);
         }
     }
@@ -160,8 +162,8 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         }
 
         if (input.jump == JUMP_BUTTON_PRESSED) {
-            player->jumpBufferCounter = GetTime();
-            if (GetTime() - player->jumpLeewayCounter < jumpLeewayTime) {
+            player->jumpBufferCounter = time;
+            if (time - player->jumpLeewayCounter < jumpLeewayTime) {
                 Jump(player); // "Coyote Time"
             }
         }
