@@ -4,7 +4,9 @@
 #include "config.h"
 #include "game_input.h"
 
-static const double moveSpeed = 2;
+static const double moveSpeed = 0.2;
+static const double maxMoveSpeed = 2;
+
 static const double gravity = 0.2;
 static const double halfGravityJumpVelocity = 0.2;
 static const double terminalVelocity = 4;
@@ -111,15 +113,27 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     const InputState input = GetInput(player->index);
     UpdatePlayerAnimator(player, content);
 
-    player->velocityX = moveSpeed * input.x;
     ApplyGraivty(player, input);
+
+    if (input.x == 0) {
+        player->velocityX = 0.0;
+        ZeroVelocityX(player);
+    }
+    else {
+        if (Sign(player->velocityX) != input.x && IsGrounded(player)) {
+            ZeroVelocityX(player);
+        }
+        
+        player->animator.flipX = input.x == -1;
+        player->velocityX += moveSpeed * input.x;
+
+        if (fabs(player->velocityX) > maxMoveSpeed) {
+            player->velocityX = maxMoveSpeed * input.x;
+        }
+    }
 
     player->physics = MoveX(player->physics, map, player->velocityX);
     player->physics = MoveY(player->physics, map, player->velocityY);
-
-    if (input.x != 0) {
-        player->animator.flipX = input.x == -1;
-    }
 
     if (IsGrounded(player)) {
         player->jumpLeewayCounter = GetTime();
@@ -143,6 +157,13 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
 
         if (IsTouchingCeiling(player)) {
             player->velocityY = 0.0;
+        }
+
+        if (IsTouchingWall(player)) {
+            if (HasJumpInput(input, player->jumpBufferCounter)) {
+                player->velocityX = -1 * Sign(player->velocityX) * maxMoveSpeed;
+                Jump(player);
+            }
         }
 
         if (input.jump == JUMP_BUTTON_PRESSED) {
