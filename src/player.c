@@ -159,13 +159,6 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             player->velocityY = 0.0;
         }
 
-        if (IsTouchingWall(player)) {
-            if (HasJumpInput(input, player->jumpBufferCounter)) {
-                player->velocityX = -1 * Sign(player->velocityX) * maxMoveSpeed;
-                Jump(player);
-            }
-        }
-
         if (input.jump == JUMP_BUTTON_PRESSED) {
             player->jumpBufferCounter = GetTime();
             if (GetTime() - player->jumpLeewayCounter < jumpLeewayTime) {
