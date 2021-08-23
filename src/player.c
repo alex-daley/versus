@@ -117,20 +117,25 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
 
     ApplyGraivty(player, input);
 
-    if (input.x == 0) {
+    // TODO: Tidy up logic.
+    if (input.x == 0 && player->state != PLAYER_JUMPWALL) {
         player->velocityX = 0.0;
         ZeroVelocityX(player);
     }
     else {
-        if (Sign(player->velocityX) != input.x && IsGrounded(player)) {
-            ZeroVelocityX(player);
-        }
-        
         player->animator.flipX = input.x == -1;
-        player->velocityX += moveSpeed * input.x;
 
-        if (fabs(player->velocityX) > maxMoveSpeed) {
-            player->velocityX = maxMoveSpeed * input.x;
+        if(player->state != PLAYER_JUMPWALL || player->velocityY > 0.0) {
+            if (Sign(player->velocityX) != input.x && IsGrounded(player)) {
+                ZeroVelocityX(player);
+            }
+
+            player->animator.flipX = input.x == -1;
+            player->velocityX += moveSpeed * input.x;
+
+            if (fabs(player->velocityX) > maxMoveSpeed) {
+                player->velocityX = maxMoveSpeed * input.x;
+            }
         }
     }
 
@@ -159,6 +164,13 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
 
         if (IsTouchingCeiling(player)) {
             player->velocityY = 0.0;
+        }
+
+        if (IsTouchingWall(player) && HasJumpInput(input, time, player->jumpBufferCounter)) {
+            Jump(player);
+            SetState(player, PLAYER_JUMPWALL);
+            int direction = HasFlag(player, CONTACT_LEFT) ? 1 : -1;
+            player->velocityX = direction * maxMoveSpeed;
         }
 
         if (input.jump == JUMP_BUTTON_PRESSED) {
