@@ -34,6 +34,7 @@ typedef struct Player {
     double velocityY;
     double jumpLeewayCounter;
     double jumpBufferCounter;
+    double wallStickCounter;
 } Player;
 
 Player LoadPlayer();

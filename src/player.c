@@ -7,12 +7,13 @@
 static const double moveSpeed = 0.2;
 static const double maxMoveSpeed = 2;
 
-static const double gravity = 0.2;
+static const double gravity = 0.25;
 static const double halfGravityJumpVelocity = 0.2;
 static const double terminalVelocity = 4;
-static const double jumpSpeed = -4;
+static const double jumpSpeed = -5;
 static const double jumpLeewayTime = 0.15;
 static const double jumpBufferTime = 0.05;
+static const double wallStickTime = 0.25;
 
 static int Sign(double velocity) {
     return velocity < 0.0 ? -1 : 1;
@@ -111,6 +112,7 @@ Player LoadPlayer() {
 
 void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     const InputState input = GetInput(player->index);
+    const Contact prevContact = player->physics.contacts;
     const double time = GetTime();
 
     UpdatePlayerAnimator(player, content);
@@ -131,8 +133,13 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             }
 
             player->animator.flipX = input.x == -1;
-            player->velocityX += moveSpeed * input.x;
 
+            if (time - player->wallStickCounter > wallStickTime) {
+                player->velocityX += moveSpeed * input.x;
+            }
+            else {
+                TraceLog(LOG_INFO, "wall stick");
+            }
             if (fabs(player->velocityX) > maxMoveSpeed) {
                 player->velocityX = maxMoveSpeed * input.x;
             }
@@ -158,12 +165,22 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         }
     }
     else { // !Grounded
+        
         if (player->velocityY > 0.0) {
             SetState(player, PLAYER_FALL);
         }
 
         if (IsTouchingCeiling(player)) {
             player->velocityY = 0.0;
+        }
+
+        if (IsTouchingWall(player)) {
+
+        }
+
+        if (IsTouchingWall(player) && (prevContact & CONTACT_LEFT) == 0) {
+            TraceLog(LOG_INFO, "Info");
+            player->wallStickCounter = time;
         }
 
         if (IsTouchingWall(player) && HasJumpInput(input, time, player->jumpBufferCounter)) {
