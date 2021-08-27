@@ -45,6 +45,10 @@ static void ApplyGraivty(Player* player, InputState input) {
     if (input.jump == JUMP_BUTTON_DOWN && (fabs(player->velocityY) < halfGravityJumpVelocity)) {
         player->velocityY += gravity * 0.5;
     }
+    // Reduce gravity a bit when we slide down a wall hit a wall
+    else if (player->velocityY > 0.0 && GetTime() - player->wallStickCounter < wallStickTime) {
+        player->velocityY += gravity * 0.5;
+    }
     else {
         player->velocityY += gravity;
     }
@@ -137,9 +141,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
             if (time - player->wallStickCounter > wallStickTime) {
                 player->velocityX += moveSpeed * input.x;
             }
-            else {
-                TraceLog(LOG_INFO, "wall stick");
-            }
+
             if (fabs(player->velocityX) > maxMoveSpeed) {
                 player->velocityX = maxMoveSpeed * input.x;
             }
@@ -178,8 +180,9 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
 
         }
 
-        if (IsTouchingWall(player) && (prevContact & CONTACT_LEFT) == 0) {
-            TraceLog(LOG_INFO, "Info");
+        // TODO: Refactor
+        if (((player->physics.contacts & CONTACT_LEFT ) && (prevContact & CONTACT_LEFT ) == 0) ||
+            ((player->physics.contacts & CONTACT_RIGHT) && (prevContact & CONTACT_RIGHT) == 0)) {
             player->wallStickCounter = time;
         }
 
