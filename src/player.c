@@ -101,29 +101,11 @@ static void Jump(Player* player) {
     player->velocityY = jumpSpeed;
 }
 
-Player LoadPlayer() {
-    int x = logicalWidth / 2;
-    int y = logicalHeight / 2;
-
-    Player player = { 0 };
-    player.physics.minX = x;
-    player.physics.minY = y;
-    player.physics.maxX = x + playerWidth;
-    player.physics.maxY = y + playerHeight;
-
-    return player;
-}
-
-void UpdatePlayer(Player* player, Content* content, Tilemap map) {
-    const InputState input = GetInput(player->index);
+static void UpdatePlayerMovement(Player* player, Tilemap map, InputState input, double time) {
     const Contact prevContact = player->physics.contacts;
-    const double time = GetTime();
-
-    UpdatePlayerAnimator(player, content);
 
     ApplyGraivty(player, input);
 
-    // TODO: Tidy up logic.
     if (input.x == 0 && player->state != PLAYER_JUMPWALL) {
         player->velocityX = 0.0;
         ZeroVelocityX(player);
@@ -131,7 +113,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
     else {
         player->animator.flipX = input.x == -1;
 
-        if(player->state != PLAYER_JUMPWALL || player->velocityY > 0.0) {
+        if (player->state != PLAYER_JUMPWALL || player->velocityY > 0.0) {
             if (Sign(player->velocityX) != input.x && IsGrounded(player)) {
                 ZeroVelocityX(player);
             }
@@ -167,7 +149,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         }
     }
     else { // !Grounded
-        
+
         if (player->velocityY > 0.0) {
             SetState(player, PLAYER_FALL);
         }
@@ -181,7 +163,7 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         }
 
         // TODO: Refactor
-        if (((player->physics.contacts & CONTACT_LEFT ) && (prevContact & CONTACT_LEFT ) == 0) ||
+        if (((player->physics.contacts & CONTACT_LEFT) && (prevContact & CONTACT_LEFT) == 0) ||
             ((player->physics.contacts & CONTACT_RIGHT) && (prevContact & CONTACT_RIGHT) == 0)) {
             player->wallStickCounter = time;
         }
@@ -202,5 +184,50 @@ void UpdatePlayer(Player* player, Content* content, Tilemap map) {
         else if (input.jump == JUMP_BUTTON_RELEASED) {
             player->velocityY *= 0.5f;
         }
+    }
+}
+
+static void UpdatePlayerBullet(Bullet* bullet, Tilemap map) {
+    bullet->physics = MoveX(bullet->physics, map, bullet->velocityX);
+    bullet->physics = MoveY(bullet->physics, map, bullet->velocityY);
+}
+
+Player LoadPlayer() {
+    int x = logicalWidth / 2;
+    int y = logicalHeight / 2;
+
+    Player player = { 0 };
+    player.physics.minX = x;
+    player.physics.minY = y;
+    player.physics.maxX = x + playerWidth;
+    player.physics.maxY = y + playerHeight;
+
+    return player;
+}
+
+void UpdatePlayer(Player* player, Content* content, Tilemap map) {
+    const InputState input = GetInput(player->index);
+    const double time = GetTime();
+
+    UpdatePlayerAnimator(player, content);
+    UpdatePlayerMovement(player, map, input, time);
+
+    if (input.shoot) {
+        player->bulletFired = true;
+
+        Bullet* bullet = &player->bullet;
+        int dir = player->animator.flipX ? -1 : 1;
+        bullet->animator.flipX = dir == -1;
+        bullet->velocityX = (maxMoveSpeed * 4) * dir;
+        bullet->velocityY = 0.0;
+        bullet->physics.minX = player->physics.minX + (16 * dir) ;
+        bullet->physics.minY = player->physics.minY + 4;
+        bullet->physics.maxX = player->physics.minX + ((playerWidth + 16 * dir)) ;
+        bullet->physics.maxY = player->physics.minY + 12;
+       
+    }
+
+    if (player->bulletFired) {
+        UpdatePlayerBullet(&player->bullet, map);
     }
 }

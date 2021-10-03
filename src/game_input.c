@@ -4,17 +4,19 @@
 
 static const float gamepadDeadzone = 0.1f;
 static const int gamepadJumpButton = GAMEPAD_BUTTON_RIGHT_FACE_DOWN;
+static const int gamepadShootButton = GAMEPAD_BUTTON_RIGHT_FACE_LEFT; 
 static const int gamepadMoveAxis = GAMEPAD_AXIS_LEFT_X;
 static const int keyboardJumpKey = KEY_SPACE;
 static const int keyboardMoveLeftKey = KEY_A;
 static const int keyboardMoveRightKey = KEY_D;
+static const int keyboardShootKey = KEY_K;
 
 static bool OutsideGamepadDeadzone(float axisValue) {
     return fabs(axisValue) > gamepadDeadzone;
 }
 
 static bool AnyInput(InputState input) {
-    return input.x != 0 || input.jump != JUMP_BUTTON_UP;
+    return input.x != 0 || input.jump != JUMP_BUTTON_UP || input.shoot;
 }
 
 static InputState GetGamepadInput(int gamepadIndex) {
@@ -41,6 +43,8 @@ static InputState GetGamepadInput(int gamepadIndex) {
         input.jump = JUMP_BUTTON_UP;
     }
     
+    input.shoot = IsGamepadButtonPressed(gamepadIndex, gamepadShootButton);
+
     return input;
 }
 
@@ -66,6 +70,8 @@ static InputState GetKeyboardInput() {
     else {
         input.jump = JUMP_BUTTON_UP;
     }
+
+    input.shoot = IsKeyPressed(keyboardShootKey);
 
     return input;
 }

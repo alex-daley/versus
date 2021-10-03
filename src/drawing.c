@@ -68,6 +68,23 @@ static void DrawTilemap(Tilemap map) {
     }
 }
 
+static void DrawBullet(Bullet bullet, const Content* content) {
+    Animation* anim = &content->bulletAnimation;
+    Rectangle src = anim->rectangles[0];
+    if (bullet.animator.flipX) {
+        src.width = -src.width;
+    }
+
+    Rectangle dst = {
+        (float)bullet.physics.minX,
+        (float)bullet.physics.minY,
+        (float)bullet.physics.maxX - bullet.physics.minX,
+        (float)bullet.physics.maxY - bullet.physics.minY
+    };
+
+    DrawTexturePro(content->playerAtlas, src, dst, (Vector2) { 0.0f, 0.0f }, 0.0f, WHITE);
+}
+
 static void DrawPlayer(Player player, const Content* content) {
     Animation* anim = player.currentAnimation;
     if (!anim) {
@@ -93,6 +110,9 @@ static void DrawPlayer(Player player, const Content* content) {
 void DrawGame(Game game) {
     DrawTilemap(game.map);
     DrawPlayer(game.player, game.content);
+    if (game.player.bulletFired) {
+        DrawBullet(game.player.bullet, game.content);
+    }
 }
 
 void DrawEditor(Editor editor, Game game) {

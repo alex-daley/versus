@@ -22,6 +22,13 @@ typedef enum PlayerState {
     PLAYER_JUMPWALL
 } PlayerState;
 
+typedef struct Bullet {
+    PhysicsObject physics;
+    Animator animator;
+    double velocityX;
+    double velocityY;
+} Bullet;
+
 typedef struct Player {
     PlayerIndex index;
 
@@ -29,12 +36,14 @@ typedef struct Player {
     Animation* currentAnimation;
     PhysicsObject physics;
     PlayerState state;
+    Bullet bullet;
 
     double velocityX;
     double velocityY;
     double jumpLeewayCounter;
     double jumpBufferCounter;
     double wallStickCounter;
+    bool bulletFired;
 } Player;
 
 Player LoadPlayer();

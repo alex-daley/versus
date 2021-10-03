@@ -37,6 +37,9 @@ static void LoadPlayerAnimations(Content* content) {
 
     content->playerFallAnimation = AllocateAnimation(1, 1);
     content->playerFallAnimation.rectangles[0] = (Rectangle){ 24.0f, 48.0f, 18.0f, 24.0f };
+
+    content->bulletAnimation = AllocateAnimation(1, 1);
+    content->bulletAnimation.rectangles[0] = (Rectangle){ 6.0f, 176.0f, 12.0f, 8.0f };
 }
 
 static void UnloadPlayerAnimations(Content* content) {
@@ -44,6 +47,7 @@ static void UnloadPlayerAnimations(Content* content) {
     FreeAnimation(content->playerMoveAnimation);
     FreeAnimation(content->playerJumpAnimation);
     FreeAnimation(content->playerFallAnimation);
+    FreeAnimation(content->bulletAnimation);
 }
 
 Content* LoadContent() {

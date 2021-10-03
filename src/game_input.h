@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 typedef enum JumpButton {
     JUMP_BUTTON_PRESSED,
@@ -9,6 +10,7 @@ typedef enum JumpButton {
 
 typedef struct InputState {
     JumpButton jump;
+    bool shoot;
     int x;
 } InputState;
 
